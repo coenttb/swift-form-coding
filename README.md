@@ -1,60 +1,197 @@
-# swift-web: A Modular Web Foundation in Swift
+# Swift URL Form Coding
 
-`swift-web` is an open source collection of modular and composable tools to simplify web development in Swift.
+A powerful, type-safe Swift library for handling web form data encoding/decoding with `application/x-www-form-urlencoded` format.
 
-## Features and Modules
+[![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-macOS%2014%20|%20iOS%2017-blue.svg)](https://swift.org)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 
-swift-web is modular by design. Here's an overview of its core components:
+## Features
 
-### **Favicon**
-- Handles favicon generation and routing with minimal effort.
+### 🔒 **Type-Safe Form Handling**
+- **URL Form Encoding/Decoding**: Complete support for `application/x-www-form-urlencoded` data
+- **Custom Parsing Strategies**: Flexible handling of nested objects, arrays, and complex data structures
+- **Swift 6 Compatibility**: Full support for Swift's latest concurrency and type safety features
 
-### **Sitemap**
-- Tools for building and serving a sitemap for your website.
+### 🔗 **[URLRouting Integration](https://github.com/coenttb/swift-url-form-coding-url-routing)**
+- **Seamless Integration**: Optional integration with Point-Free's URLRouting library
+- **Conversion Protocol**: Easy integration with routing systems via the `Conversion` protocol
+- **Type-Safe Routes**: Define routes with compile-time guarantees for form data handling
 
-### **UrlFormCoding**
-- Encodes and decodes URL-encoded forms for easy form handling.
+## Quick Start
 
-## Installation
+### Installation
 
-To use **swift-web** in your project, add it to your `Package.swift` dependencies:
+Add `swift-url-form-coding` to your Swift package:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/coenttb/swift-web.git", branch: "main")
+    .package(url: "https://github.com/coenttb/swift-url-form-coding.git", from: "0.0.1")
 ]
 ```
 
-## Related projects
+### Basic Form Handling
 
-### The coenttb stack
+```swift
+import URLFormCoding
 
-* [swift-css](https://www.github.com/coenttb/swift-css): A Swift DSL for type-safe CSS.
-* [swift-html](https://www.github.com/coenttb/swift-html): A Swift DSL for type-safe HTML & CSS, integrating [swift-css](https://www.github.com/coenttb/swift-css) and [pointfree-html](https://www.github.com/coenttb/pointfree-html).
-* [swift-web](https://www.github.com/coenttb/swift-web): Foundational tools for web development in Swift.
-* [coenttb-html](https://www.github.com/coenttb/coenttb-html): Builds on [swift-html](https://www.github.com/coenttb/swift-html), and adds functionality for HTML, Markdown, Email, and printing HTML to PDF.
-* [coenttb-web](https://www.github.com/coenttb/coenttb-web): Builds on [swift-web](https://www.github.com/coenttb/swift-web), and adds functionality for web development.
-* [coenttb-server](https://www.github.com/coenttb/coenttb-server): Build fast, modern, and safe servers that are a joy to write. `coenttb-server` builds on [coenttb-web](https://www.github.com/coenttb/coenttb-web), and adds functionality for server development.
-* [coenttb-vapor](https://www.github.com/coenttb/coenttb-server-vapor): `coenttb-server-vapor` builds on [coenttb-server](https://www.github.com/coenttb/coenttb-server), and adds functionality and integrations with Vapor and Fluent.
-* [coenttb-com-server](https://www.github.com/coenttb/coenttb-com-server): The backend server for coenttb.com, written entirely in Swift and powered by [coenttb-server-vapor](https://www.github.com/coenttb-server-vapor).
+// Define your data model
+struct LoginRequest: Codable {
+    let username: String
+    let password: String
+    let rememberMe: Bool
+}
 
-### PointFree foundations
-* [coenttb/pointfree-html](https://www.github.com/coenttb/pointfree-html): A Swift DSL for type-safe HTML, forked from [pointfreeco/swift-html](https://www.github.com/pointfreeco/swift-html) and updated to the version on [pointfreeco/pointfreeco](https://github.com/pointfreeco/pointfreeco).
-* [coenttb/pointfree-web](https://www.github.com/coenttb/pointfree-html): Foundational tools for web development in Swift, forked from  [pointfreeco/swift-web](https://www.github.com/pointfreeco/swift-web).
-* [coenttb/pointfree-server](https://www.github.com/coenttb/pointfree-html): Foundational tools for server development in Swift, forked from  [pointfreeco/swift-web](https://www.github.com/pointfreeco/swift-web).
+// Create encoder and decoder
+let encoder = Form.Encoder()
+let decoder = Form.Decoder()
 
-## Feedback is Much Appreciated!
-  
-If you’re working on your own Swift web project, feel free to learn, fork, and contribute.
+// Encode to form data
+let request = LoginRequest(username: "john", password: "secret", rememberMe: true)
+let formData = try encoder.encode(request)
+// Result: "username=john&password=secret&rememberMe=true"
 
-Got thoughts? Found something you love? Something you hate? Let me know! Your feedback helps make this project better for everyone. Open an issue or start a discussion—I’m all ears.
+// Decode from form data
+let formString = "username=john&password=secret&rememberMe=true"
+let decoded = try decoder.decode(LoginRequest.self, from: Data(formString.utf8))
+print(decoded.username) // "john"
+```
+
+
+## Advanced Usage
+
+### Custom Form Decoding Strategies
+
+```swift
+// Configure decoder for nested objects
+let decoder = Form.Decoder()
+decoder.parsingStrategy = .brackets  // Supports user[profile][name]=value
+decoder.dateDecodingStrategy = .iso8601
+decoder.arrayDecodingStrategy = .brackets
+
+// Use the custom decoder
+let formData = "user[profile][name]=John&user[profile][age]=30"
+let user = try decoder.decode(ComplexUser.self, from: Data(formData.utf8))
+```
+
+### Supported Parsing Strategies
+
+| Strategy | Example | Use Case |
+|----------|---------|----------|
+| **Default** | `name=value&age=30` | Simple key-value pairs |
+| **Brackets** | `user[name]=John&user[age]=30` | Nested objects |
+| **Accumulate** | `tags=swift&tags=ios&tags=web` | Multiple values per key |
+
+
+## Core Components
+
+### URLFormCoding
+
+The foundation for URL-encoded form data handling:
+
+```swift
+// Basic encoding/decoding
+let encoder = Form.Encoder()
+let decoder = Form.Decoder()
+
+struct User: Codable {
+    let name: String
+    let preferences: [String: String]
+    let createdAt: Date
+}
+
+// Encode to form data
+let user = User(name: "John", preferences: ["theme": "dark"], createdAt: Date())
+let formData = try encoder.encode(user)
+// Result: "name=John&preferences[theme]=dark&createdAt=2024-01-01T12:00:00Z"
+
+// Decode from form data
+let decoded = try decoder.decode(User.self, from: formData)
+```
+
+
+## Security Features
+
+- **Input Validation**: Automatic validation of form field types and formats
+- **URL Decoding**: Proper handling of URL-encoded data with security considerations
+- **Memory Safety**: Efficient parsing that prevents buffer overflows
+
+## Error Handling
+
+```swift
+do {
+    let user = try formDecoder.decode(User.self, from: formData)
+} catch let error as Form.Decoder.Error {
+    switch error {
+    case .invalidFormat:
+        print("Invalid form data format")
+    case .missingRequiredField(let field):
+        print("Missing required field: \(field)")
+    case .typeMismatch(let field, let expectedType):
+        print("Type mismatch for \(field), expected \(expectedType)")
+    }
+}
+
+```
+
+## Testing
+
+The library includes comprehensive test suites:
+
+```bash
+swift test
+```
+
+Test coverage includes:
+- ✅ URL form encoding/decoding with various data types
+- ✅ Custom parsing strategies (brackets, accumulate, default)
+- ✅ Error handling scenarios
+- ✅ Date and array decoding strategies
+- ✅ Memory safety and edge cases
+
+## Requirements
+
+- **Swift**: 6.0+
+- **Platforms**: macOS 14.0+, iOS 17.0+
+- **Dependencies**: None (pure Swift implementation)
+
+## Related Projects
+
+### The coenttb Stack
+
+* [swift-css](https://github.com/coenttb/swift-css): A Swift DSL for type-safe CSS
+* [swift-html](https://github.com/coenttb/swift-html): A Swift DSL for type-safe HTML & CSS
+* [swift-web](https://github.com/coenttb/swift-web): Foundational web development tools
+* [coenttb-web](https://github.com/coenttb/coenttb-web): Enhanced web development functionality
+* [coenttb-server](https://github.com/coenttb/coenttb-server): Modern server development tools
+
+### PointFree Foundations
+
+* [swift-url-routing](https://github.com/pointfreeco/swift-url-routing): Type-safe URL routing
+* [swift-dependencies](https://github.com/pointfreeco/swift-dependencies): Dependency management system
+
+## Contributing
+
+Contributions are welcome! Please feel free to:
+
+1. **Open Issues**: Report bugs or request features
+2. **Submit PRs**: Improve documentation, add features, or fix bugs  
+3. **Share Feedback**: Let us know how you're using the library
+
+## License
+
+This project is licensed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for details.
+
+## Feedback & Support
+
+Your feedback makes this project better for everyone!
 
 > [Subscribe to my newsletter](http://coenttb.com/en/newsletter/subscribe)
 >
 > [Follow me on X](http://x.com/coenttb)
 > 
-> [Link on Linkedin](https://www.linkedin.com/in/tenthijeboonkkamp)
+> [Connect on LinkedIn](https://www.linkedin.com/in/tenthijeboonkkamp)
 
-## License
+---
 
-This project is licensed under the **Apache 2.0 License**. See the [LICENSE](LICENSE).
+**swift-url-form-coding** - Type-safe web form handling for modern Swift applications.

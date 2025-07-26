@@ -7,15 +7,15 @@
 
 import Foundation
 
-//extension CharacterSet {
+// extension CharacterSet {
 //    public static let urlQueryParamAllowed = CharacterSet.urlQueryAllowed
 //        .subtracting(.init(charactersIn: ":#[]@!$&'()*+,;="))
-//}
+// }
 
-//extension CharacterSet {
+// extension CharacterSet {
 //    public static let urlQueryParamAllowed = CharacterSet.urlQueryAllowed
 //        .subtracting(.init(charactersIn: ":#[]@!$&'()*+,;="))
-//}
+// }
 
 extension CharacterSet {
   @usableFromInline

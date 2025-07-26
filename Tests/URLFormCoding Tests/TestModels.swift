@@ -1,6 +1,6 @@
 //
 //  TestModels.swift
-//  UrlFormCoding Tests
+//  URLFormCoding Tests
 //
 //  Created by Coen ten Thije Boonkkamp on 26/07/2025.
 //
@@ -18,7 +18,7 @@ struct BasicUser: Codable, Equatable {
 struct NestedUser: Codable, Equatable {
     let name: String
     let profile: Profile
-    
+
     struct Profile: Codable, Equatable {
         let bio: String
         let website: String?
