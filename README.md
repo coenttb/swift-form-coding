@@ -150,24 +150,7 @@ Test coverage includes:
 
 ## Requirements
 
-- **Swift**: 6.0+
-- **Platforms**: macOS 14.0+, iOS 17.0+
-- **Dependencies**: None (pure Swift implementation)
-
-## Related Projects
-
-### The coenttb Stack
-
-* [swift-css](https://github.com/coenttb/swift-css): A Swift DSL for type-safe CSS
-* [swift-html](https://github.com/coenttb/swift-html): A Swift DSL for type-safe HTML & CSS
-* [swift-web](https://github.com/coenttb/swift-web): Foundational web development tools
-* [coenttb-web](https://github.com/coenttb/coenttb-web): Enhanced web development functionality
-* [coenttb-server](https://github.com/coenttb/coenttb-server): Modern server development tools
-
-### PointFree Foundations
-
-* [swift-url-routing](https://github.com/pointfreeco/swift-url-routing): Type-safe URL routing
-* [swift-dependencies](https://github.com/pointfreeco/swift-dependencies): Dependency management system
+- **Swift**: 5.9+ (Full Swift 6 support)
 
 ## Contributing
 
@@ -179,15 +162,11 @@ Contributions are welcome! Please feel free to:
 
 ## Acknowledgements
 
-This project builds upon foundational work by Point-Free (Brandon Williams and Stephen Celis). This package's Form.Encoder and Form.Decoder are from their [swift-web](https://github.com/pointfreeco/swift-web) library.
+This project builds upon foundational work by Point-Free (Brandon Williams and Stephen Celis). This package's Form.Encoder and Form.Decoder are forked from their [swift-web](https://github.com/pointfreeco/swift-web) in [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding).
 
 ## License
 
 This project is licensed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for details.
-
-The Form.Encoder and Form.Decoder files are licensed under the MIT License:
-- https://github.com/coenttb/swift-url-form-coding/blob/main/Sources/URLFormCoding/Form.Decoder.swift
-- https://github.com/coenttb/swift-url-form-coding/blob/main/Sources/URLFormCoding/Form.Encoder.swift
 
 ## Feedback & Support
 
