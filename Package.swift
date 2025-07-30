@@ -8,6 +8,7 @@ extension String {
 
 extension Target.Dependency {
     static var urlFormCoding: Self { .target(name: .urlFormCoding) }
+    static var pointfreeUrlFormCoding: Self { .product(name: "PointFreeURLFormCoding", package: "pointfree-url-form-coding") }
 }
 
 let package = Package(
@@ -15,11 +16,15 @@ let package = Package(
     products: [
         .library(name: .urlFormCoding, targets: [.urlFormCoding])
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.0.1")
+    ],
     targets: [
         .target(
             name: .urlFormCoding,
-            dependencies: []
+            dependencies: [
+                .pointfreeUrlFormCoding
+            ]
         ),
         .testTarget(
             name: .urlFormCoding.tests,
