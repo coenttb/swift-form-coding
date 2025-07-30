@@ -823,11 +823,8 @@ struct FormDecoderTests {
 
         @Test("Round-trips dates with matching strategies")
         func testRoundTripsDatessWithMatchingStrategies() throws {
-            let encoder = Form.Encoder()
-            let decoder = Form.Decoder()
-
-            encoder.dateEncodingStrategy = .secondsSince1970
-            decoder.dateDecodingStrategy = .secondsSince1970
+            let encoder = Form.Encoder(dateEncodingStrategy: .secondsSince1970)
+            let decoder = Form.Decoder(dateDecodingStrategy: .secondsSince1970)
 
             let date = Date(timeIntervalSince1970: 1234567890)
             let original = UserWithDates(
@@ -844,11 +841,8 @@ struct FormDecoderTests {
 
         @Test("Round-trips data with matching strategies")
         func testRoundTripsDataWithMatchingStrategies() throws {
-            let encoder = Form.Encoder()
-            let decoder = Form.Decoder()
-
-            encoder.dataEncodingStrategy = .base64
-            decoder.dataDecodingStrategy = .base64
+            let encoder = Form.Encoder(dataEncodingStrategy: .base64)
+            let decoder = Form.Decoder(dataDecodingStrategy: .base64)
 
             let testData = "Hello World".data(using: .utf8)!
             let original = UserWithData(
@@ -871,8 +865,7 @@ struct FormDecoderTests {
 
         @Test("Decodes large query strings efficiently")
         func testDecodesLargeQueryStringsEfficiently() throws {
-            let decoder = Form.Decoder()
-            decoder.parsingStrategy = .accumulateValues
+            let decoder = Form.Decoder(parsingStrategy: .accumulateValues)
 
             // Create a large query string with many repeated keys
             var components: [String] = ["name=Performance%20Test"]
@@ -893,8 +886,7 @@ struct FormDecoderTests {
 
         @Test("Parses complex nested structures efficiently")
         func testParsesComplexNestedStructuresEfficiently() throws {
-            let decoder = Form.Decoder()
-            decoder.parsingStrategy = .brackets
+            let decoder = Form.Decoder(parsingStrategy: .brackets)
 
             // Create complex nested structure
             var components: [String] = ["name=Complex%20Test"]

@@ -257,8 +257,7 @@ struct FormEncoderTests {
 
         @Test("Encodes dates as seconds since 1970")
         func testEncodesDatesAsSecondsSince1970() throws {
-            let encoder = Form.Encoder()
-            encoder.dateEncodingStrategy = .secondsSince1970
+            let encoder = Form.Encoder(dateEncodingStrategy: .secondsSince1970)
 
             let date = Date(timeIntervalSince1970: 1234567890)
             let user = UserWithDates(
@@ -276,8 +275,7 @@ struct FormEncoderTests {
 
         @Test("Encodes dates as milliseconds since 1970")
         func testEncodesDatesAsMillisecondsSince1970() throws {
-            let encoder = Form.Encoder()
-            encoder.dateEncodingStrategy = .millisecondsSince1970
+            let encoder = Form.Encoder(dateEncodingStrategy: .millisecondsSince1970)
 
             let date = Date(timeIntervalSince1970: 1234567.890)
             let user = UserWithDates(
@@ -297,10 +295,9 @@ struct FormEncoderTests {
 
         @Test("Encodes dates with custom formatter")
         func testEncodesDatesWithCustomFormatter() throws {
-            let encoder = Form.Encoder()
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
-            encoder.dateEncodingStrategy = .formatted(formatter)
+            let encoder = Form.Encoder(dateEncodingStrategy: .formatted(formatter))
 
             let date = Date(timeIntervalSince1970: 1234567890) // 2009-02-13
             let user = UserWithDates(
@@ -347,8 +344,7 @@ struct FormEncoderTests {
 
         @Test("Encodes data with base64 strategy")
         func testEncodesDataWithBase64Strategy() throws {
-            let encoder = Form.Encoder()
-            encoder.dataEncodingStrategy = .base64
+            let encoder = Form.Encoder(dataEncodingStrategy: .base64)
 
             let testData = "Hello World".data(using: .utf8)!
             let user = UserWithData(
@@ -423,11 +419,8 @@ struct FormEncoderTests {
 
         @Test("Dates round-trip correctly with matching strategies")
         func testDatesRoundTripCorrectlyWithMatchingStrategies() throws {
-            let encoder = Form.Encoder()
-            let decoder = Form.Decoder()
-
-            encoder.dateEncodingStrategy = .secondsSince1970
-            decoder.dateDecodingStrategy = .secondsSince1970
+            let encoder = Form.Encoder(dateEncodingStrategy: .secondsSince1970)
+            let decoder = Form.Decoder(dateDecodingStrategy: .secondsSince1970)
 
             let date = Date(timeIntervalSince1970: 1234567890)
             let original = UserWithDates(

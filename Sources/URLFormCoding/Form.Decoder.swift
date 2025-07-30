@@ -1,3 +1,27 @@
+//https://github.com/pointfreeco/swift-web/tree/main/Sources/UrlFormEncoding
+//
+//MIT License
+//
+//Copyright (c) 2017 Point-Free, Inc.
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy
+//of this software and associated documentation files (the "Software"), to deal
+//in the Software without restriction, including without limitation the rights
+//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//copies of the Software, and to permit persons to whom the Software is
+//furnished to do so, subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+//
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//SOFTWARE.
+
 import Foundation
 
 /// A decoder that converts URL-encoded form data to Swift Codable types.
@@ -68,12 +92,19 @@ extension Form {
             return containers.last!
         }
         public private(set) var codingPath: [CodingKey] = []
-        public var dataDecodingStrategy: DataDecodingStrategy = .deferredToData
-        public var dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
-        public var parsingStrategy: ParsingStrategy = .accumulateValues
+        public var dataDecodingStrategy: DataDecodingStrategy
+        public var dateDecodingStrategy: DateDecodingStrategy
+        public var parsingStrategy: ParsingStrategy
         public let userInfo: [CodingUserInfoKey: Any] = [:]
 
-        public init() {
+        public init(
+            dataDecodingStrategy: DataDecodingStrategy = .deferredToData,
+            dateDecodingStrategy: DateDecodingStrategy = .deferredToDate,
+            parsingStrategy: ParsingStrategy = .accumulateValues
+        ) {
+            self.dataDecodingStrategy = dataDecodingStrategy
+            self.dateDecodingStrategy = dateDecodingStrategy
+            self.parsingStrategy = parsingStrategy
         }
 
         public func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
@@ -279,7 +310,7 @@ extension Form {
             }
 
             func decode(_ type: String.Type, forKey key: Key) throws -> String {
-                return try self.unwrap(key, id)
+                return try self.unwrap(key, { $0 })
             }
 
             func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
@@ -436,7 +467,7 @@ extension Form {
             }
 
             mutating func decode(_ type: String.Type) throws -> String {
-                return try self.unwrap(id)
+                return try self.unwrap({ $0 })
             }
 
             mutating func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
@@ -572,7 +603,7 @@ extension Form {
             }
 
             func decode(_ type: String.Type) throws -> String {
-                return try self.unwrap(id)
+                return try self.unwrap({ $0 })
             }
 
             func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
