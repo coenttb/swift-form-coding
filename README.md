@@ -178,9 +178,17 @@ Contributions are welcome! Please feel free to:
 2. **Submit PRs**: Improve documentation, add features, or fix bugs  
 3. **Share Feedback**: Let us know how you're using the library
 
+## Acknowledgements
+
+This project builds upon foundational work by Point-Free (Brandon Williams and Stephen Celis). This package's Form.Encoder and Form.Decoder are from their [swift-web](https://github.com/pointfreeco/swift-web) library. 
+
 ## License
 
 This project is licensed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for details.
+
+The Form.Encoder and Form.Decoder files are licensed under the MIT License:
+- https://github.com/coenttb/swift-url-form-coding/blob/main/Sources/URLFormCoding/Form.Decoder.swift
+- https://github.com/coenttb/swift-url-form-coding/blob/main/Sources/URLFormCoding/Form.Encoder.swift
 
 ## Feedback & Support
 
