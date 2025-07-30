@@ -57,7 +57,6 @@ let decoded = try decoder.decode(LoginRequest.self, from: Data(formString.utf8))
 print(decoded.username) // "john"
 ```
 
-
 ## Advanced Usage
 
 ### Custom Form Decoding Strategies
@@ -180,7 +179,7 @@ Contributions are welcome! Please feel free to:
 
 ## Acknowledgements
 
-This project builds upon foundational work by Point-Free (Brandon Williams and Stephen Celis). This package's Form.Encoder and Form.Decoder are from their [swift-web](https://github.com/pointfreeco/swift-web) library. 
+This project builds upon foundational work by Point-Free (Brandon Williams and Stephen Celis). This package's Form.Encoder and Form.Decoder are from their [swift-web](https://github.com/pointfreeco/swift-web) library.
 
 ## License
 

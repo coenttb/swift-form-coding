@@ -1,0 +1,15 @@
+{
+  "originHash" : "7b288aaa91db43aa92e502917aebc7c4cbaf78739683e7d56dc631a2c0505b86",
+  "pins" : [
+    {
+      "identity" : "pointfree-url-form-coding",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/coenttb/pointfree-url-form-coding.git",
+      "state" : {
+        "revision" : "af03fc6add28e695590a0912d9b13668dc35a66a",
+        "version" : "0.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}
