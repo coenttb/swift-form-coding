@@ -8,7 +8,6 @@
 import Foundation
 
 extension CharacterSet {
-    @usableFromInline
     static let urlQueryParamAllowed = CharacterSet
         .urlQueryAllowed
         .subtracting(Self(charactersIn: ":#[]@!$&'()*+,;="))

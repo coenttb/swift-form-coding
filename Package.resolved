@@ -6,7 +6,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/coenttb/pointfree-url-form-coding.git",
       "state" : {
-        "revision" : "af03fc6add28e695590a0912d9b13668dc35a66a",
+        "revision" : "20c06173a90ff7a90e20d9f216b99632b68031ca",
         "version" : "0.0.1"
       }
     }
