@@ -27,8 +27,7 @@ let package = Package(
                 .urlFormCoding
             ]
         )
-    ],
-    swiftLanguageModes: [.v5]
+    ]
 )
 
 extension String { var tests: Self { self + " Tests" } }

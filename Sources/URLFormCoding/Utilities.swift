@@ -1,10 +1,10 @@
-//import Foundation
-//
-//// MARK: - Identity Function
-//package func id<A>(_ a: A) -> A {
-//    return a
-//}
-//
+import Foundation
+
+// MARK: - Identity Function
+package func id<A>(_ a: A) -> A {
+    return a
+}
+
 // MARK: - Function Composition
 precedencegroup ForwardComposition {
     associativity: left

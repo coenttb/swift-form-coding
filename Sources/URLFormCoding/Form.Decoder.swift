@@ -310,7 +310,7 @@ extension Form {
             }
 
             func decode(_ type: String.Type, forKey key: Key) throws -> String {
-                return try self.unwrap(key, { $0 })
+                return try self.unwrap(key, id)
             }
 
             func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
@@ -467,7 +467,7 @@ extension Form {
             }
 
             mutating func decode(_ type: String.Type) throws -> String {
-                return try self.unwrap({ $0 })
+                return try self.unwrap(id)
             }
 
             mutating func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
@@ -603,7 +603,7 @@ extension Form {
             }
 
             func decode(_ type: String.Type) throws -> String {
-                return try self.unwrap({ $0 })
+                return try self.unwrap(id)
             }
 
             func decode<T>(_ type: T.Type) throws -> T where T: Decodable {
@@ -833,7 +833,7 @@ private func parse(isArray: @escaping (String) -> Bool, sort: Bool = false) -> (
     }
 }
 
-public func parse(query: String) -> [(String, String?)] {
+private func parse(query: String) -> [(String, String?)] {
     return pairs(query)
 }
 
