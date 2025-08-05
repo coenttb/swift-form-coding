@@ -12,3 +12,8 @@ extension CharacterSet {
         .urlQueryAllowed
         .subtracting(Self(charactersIn: ":#[]@!$&'()*+,;="))
 }
+
+//public extension CharacterSet {
+//  static let urlQueryComponentAllowed = CharacterSet.urlQueryAllowed
+//    .subtracting(CharacterSet(charactersIn: "&="))
+//}
