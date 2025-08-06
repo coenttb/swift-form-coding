@@ -140,28 +140,43 @@ extension Multipart.Conversion: URLRouting.Conversion {
             let components = pair.split(separator: "=", maxSplits: 1)
             guard components.count == 2 else { continue }
             
-            let key = String(components[0])
-            let value = String(components[1])
+            let encodedKey = String(components[0])
+            let encodedValue = String(components[1])
             
-            // URL decode the value
-            let decodedValue = value
-                .replacingOccurrences(of: "+", with: " ")
-                .removingPercentEncoding ?? value
+            // URL decode both key and value (handle percent encoding first, then + to space)
+            let decodedKey = encodedKey
+                .removingPercentEncoding?
+                .replacingOccurrences(of: "+", with: " ") ?? encodedKey
+            
+            let decodedValue = encodedValue
+                .removingPercentEncoding?
+                .replacingOccurrences(of: "+", with: " ") ?? encodedValue
             
             // Create form field
             let field = Multipart.FormField(
-                name: key,
+                name: decodedKey,
                 contentType: "text/plain",
                 data: decodedValue.data(using: .utf8) ?? Data()
             )
+            
+            // Sanitize field name to prevent header injection
+            let sanitizedName = field.name
+                .replacingOccurrences(of: "\r", with: "")
+                .replacingOccurrences(of: "\n", with: "")
+                .replacingOccurrences(of: "\"", with: "'")
             
             // Append boundary
             body.append("--\(boundary)\r\n")
             
             // Add Content-Disposition header
-            var disposition = "Content-Disposition: form-data; name=\"\(field.name)\""
+            var disposition = "Content-Disposition: form-data; name=\"\(sanitizedName)\""
             if let filename = field.filename {
-                disposition += "; filename=\"\(filename)\""
+                // Sanitize filename as well
+                let sanitizedFilename = filename
+                    .replacingOccurrences(of: "\r", with: "")
+                    .replacingOccurrences(of: "\n", with: "")
+                    .replacingOccurrences(of: "\"", with: "'")
+                disposition += "; filename=\"\(sanitizedFilename)\""
             }
             body.append("\(disposition)\r\n")
             
