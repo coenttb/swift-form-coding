@@ -54,6 +54,7 @@ import Foundation
 /// - Note: The conversion validates file content during both `apply` and `unapply` operations.
 extension Multipart {
     public struct FileUpload {
+        
         /// The unique boundary string used to separate multipart fields.
         public let boundary: String
 
@@ -105,14 +106,14 @@ extension Multipart {
 
         /// Generates a cryptographically safe boundary string for multipart data.
         ///
-        /// The boundary uses alphanumeric characters and is prefixed with "Boundary-"
-        /// to ensure uniqueness and prevent conflicts with file content.
+        /// Uses UUID for maximum uniqueness and security. The boundary format
+        /// follows RFC 2046 recommendations for multipart boundaries.
         ///
         /// - Returns: A unique boundary string safe for multipart usage
         private static func generateBoundary() -> String {
-            let characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-            let randomString = (0..<15).map { _ in String(characters.randomElement()!) }.joined()
-            return "Boundary-\(randomString)"  // 9 + 15 = 24 characters total
+            // Use UUID for boundary generation - provides 36 characters of uniqueness
+            // This ensures the boundary is extremely unlikely to appear in content
+            return "Boundary-\(UUID().uuidString)"
         }
 
         public func validate(_ data: Foundation.Data) throws {

@@ -101,7 +101,7 @@ struct URLRoutingMultipartTests {
             let multipartCoding = Multipart.Conversion(BasicUser.self)
             let user = BasicUser(name: "Jane Doe", age: 25, isActive: false)
 
-            let data = multipartCoding.unapply(user)
+            let data = try multipartCoding.unapply(user)
             let multipartString = String(data: data, encoding: .utf8)!
 
             // Should contain multipart boundaries and headers
@@ -125,7 +125,7 @@ struct URLRoutingMultipartTests {
                 isVerified: true
             )
 
-            let data = multipartCoding.unapply(user)
+            let data = try multipartCoding.unapply(user)
             let multipartString = String(data: data, encoding: .utf8)!
 
             // Should contain non-nil values
@@ -549,7 +549,7 @@ struct URLRoutingMultipartTests {
         }
         
         @Test("Multipart.Conversion produces non-empty body for simple request")
-        func testMultipartConversionProducesNonEmptyBody() {
+        func testMultipartConversionProducesNonEmptyBody() throws {
             let request = UpdateRequest(
                 address: nil,
                 name: "Updated Name",
@@ -558,7 +558,7 @@ struct URLRoutingMultipartTests {
             )
             
             let conversion = Multipart.Conversion(UpdateRequest.self)
-            let body = conversion.unapply(request)
+            let body = try conversion.unapply(request)
             
             // The body should not be empty
             #expect(body.count > 0, "Multipart body should not be empty")
@@ -575,7 +575,7 @@ struct URLRoutingMultipartTests {
         }
         
         @Test("Multipart.Conversion handles multiple fields correctly")
-        func testMultipartConversionHandlesMultipleFields() {
+        func testMultipartConversionHandlesMultipleFields() throws {
             let request = UpdateRequest(
                 address: "test@example.com",
                 name: "John Doe",
@@ -584,7 +584,7 @@ struct URLRoutingMultipartTests {
             )
             
             let conversion = Multipart.Conversion(UpdateRequest.self)
-            let body = conversion.unapply(request)
+            let body = try conversion.unapply(request)
             
             #expect(body.count > 0, "Multipart body should not be empty")
             
@@ -605,7 +605,7 @@ struct URLRoutingMultipartTests {
         }
         
         @Test("Multipart.Conversion skips nil optional fields")
-        func testMultipartConversionSkipsNilFields() {
+        func testMultipartConversionSkipsNilFields() throws {
             let request = UpdateRequest(
                 address: nil,
                 name: "Only Name",
@@ -614,7 +614,7 @@ struct URLRoutingMultipartTests {
             )
             
             let conversion = Multipart.Conversion(UpdateRequest.self)
-            let body = conversion.unapply(request)
+            let body = try conversion.unapply(request)
             
             let bodyString = String(data: body, encoding: .utf8) ?? ""
             
@@ -629,7 +629,7 @@ struct URLRoutingMultipartTests {
         }
         
         @Test("Multipart.Conversion handles empty request correctly")
-        func testMultipartConversionHandlesEmptyRequest() {
+        func testMultipartConversionHandlesEmptyRequest() throws {
             let request = UpdateRequest(
                 address: nil,
                 name: nil,
@@ -638,7 +638,7 @@ struct URLRoutingMultipartTests {
             )
             
             let conversion = Multipart.Conversion(UpdateRequest.self)
-            let body = conversion.unapply(request)
+            let body = try conversion.unapply(request)
             
             // Empty request should produce empty body or minimal boundary-only body
             #expect(body.count == 0 || body.count < 50, "Empty request should produce empty or minimal body")
@@ -655,7 +655,7 @@ struct URLRoutingMultipartTests {
             let multipartCoding = Multipart.Conversion(BasicUser.self)
             let user = BasicUser(name: "John & Jane", age: 30, isActive: true)
 
-            let data = multipartCoding.unapply(user)
+            let data = try multipartCoding.unapply(user)
             let multipartString = String(data: data, encoding: .utf8)!
 
             #expect(multipartString.contains("John & Jane"))
@@ -666,7 +666,7 @@ struct URLRoutingMultipartTests {
             let multipartCoding = Multipart.Conversion(BasicUser.self)
             let user = BasicUser(name: "José María 🇪🇸", age: 30, isActive: true)
 
-            let data = multipartCoding.unapply(user)
+            let data = try multipartCoding.unapply(user)
             let multipartString = String(data: data, encoding: .utf8)!
 
             #expect(multipartString.contains("José María 🇪🇸"))
@@ -678,7 +678,7 @@ struct URLRoutingMultipartTests {
             let longName = String(repeating: "a", count: 10000)
             let user = BasicUser(name: longName, age: 30, isActive: true)
 
-            let data = multipartCoding.unapply(user)
+            let data = try multipartCoding.unapply(user)
 
             #expect(data.count > 10000)
         }
@@ -834,7 +834,7 @@ struct URLRoutingMultipartTests {
             )
 
             // Should complete without timeout
-            let data = multipartCoding.unapply(user)
+            let data = try multipartCoding.unapply(user)
             #expect(!data.isEmpty)
         }
 

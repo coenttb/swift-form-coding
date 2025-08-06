@@ -3,6 +3,29 @@ import Shared
 import URLMultipartFormCoding
 import URLRouting
 
+// Helper extension for efficient string appending to Data
+private extension Data {
+    mutating func appendString(_ string: String) {
+        if let data = string.data(using: .utf8, allowLossyConversion: false) {
+            self.append(data)
+        }
+    }
+}
+
+// Error types for multipart encoding failures
+private struct InvalidUTF8Error: Error, LocalizedError {
+    var errorDescription: String? {
+        "Failed to convert encoded form data to UTF-8 string"
+    }
+}
+
+private struct InvalidFieldDataError: Error, LocalizedError {
+    let fieldName: String
+    var errorDescription: String? {
+        "Failed to encode field '\(fieldName)' as UTF-8 data"
+    }
+}
+
 /// A conversion that handles multipart/form-data encoding and decoding for URLRouting.
 ///
 /// `MultipartFormCoding` provides a way to convert Codable Swift types to and from
@@ -67,6 +90,7 @@ extension Multipart {
         /// - Parameters:
         ///   - type: The Codable type to convert to/from
         ///   - decoder: Custom URL form decoder (optional, uses default if not provided)
+        ///   - encoder: Custom URL form encoder (optional, uses default if not provided)
         public init(
             _ type: Value.Type,
             decoder: Form.Decoder = .init(),
@@ -74,6 +98,9 @@ extension Multipart {
         ) {
             self.decoder = decoder
             self.encoder = encoder
+            // Use UUID for boundary generation - provides 36 characters of uniqueness
+            // Format: "Boundary-UUID" where UUID is 36 chars (including hyphens)
+            // This gives us a boundary that's highly unlikely to appear in content
             self.boundary = "Boundary-\(UUID().uuidString)"
         }
         
@@ -103,11 +130,12 @@ extension Multipart.Conversion: URLRouting.Conversion {
     
     /// Converts a Swift value to multipart form data.
     ///
-    /// This method serializes the Swift value to JSON, then converts each field
+    /// This method serializes the Swift value to URL-encoded format, then converts each field
     /// to a multipart form field with appropriate headers and boundaries.
     ///
     /// - Parameter output: The Swift value to encode
     /// - Returns: The multipart form data as `Data`
+    /// - Throws: An error if encoding fails
     ///
     /// ## Multipart Format
     ///
@@ -120,17 +148,15 @@ extension Multipart.Conversion: URLRouting.Conversion {
     /// fieldValue
     /// --Boundary-<UUID>--
     /// ```
-    public func unapply(_ output: Value) -> Foundation.Data {
+    public func unapply(_ output: Value) throws -> Foundation.Data {
         var body = Data()
         
         // Encode the value to URL-encoded form data
-        guard let fieldData = try? encoder.encode(output) else {
-            return body
-        }
+        let fieldData = try encoder.encode(output)
         
         // Convert URL-encoded data to string
         guard let urlEncodedString = String(data: fieldData, encoding: .utf8) else {
-            return body
+            throw InvalidUTF8Error()
         }
         
         // Parse URL-encoded string into key-value pairs
@@ -153,10 +179,14 @@ extension Multipart.Conversion: URLRouting.Conversion {
                 .replacingOccurrences(of: "+", with: " ") ?? encodedValue
             
             // Create form field
+            guard let valueData = decodedValue.data(using: .utf8) else {
+                throw InvalidFieldDataError(fieldName: decodedKey)
+            }
+            
             let field = Multipart.FormField(
                 name: decodedKey,
                 contentType: "text/plain",
-                data: decodedValue.data(using: .utf8) ?? Data()
+                data: valueData
             )
             
             // Sanitize field name to prevent header injection
@@ -166,7 +196,7 @@ extension Multipart.Conversion: URLRouting.Conversion {
                 .replacingOccurrences(of: "\"", with: "'")
             
             // Append boundary
-            body.append("--\(boundary)\r\n")
+            body.appendString("--\(boundary)\r\n")
             
             // Add Content-Disposition header
             var disposition = "Content-Disposition: form-data; name=\"\(sanitizedName)\""
@@ -178,24 +208,24 @@ extension Multipart.Conversion: URLRouting.Conversion {
                     .replacingOccurrences(of: "\"", with: "'")
                 disposition += "; filename=\"\(sanitizedFilename)\""
             }
-            body.append("\(disposition)\r\n")
+            body.appendString("\(disposition)\r\n")
             
             // Add Content-Type if specified
             if let contentType = field.contentType {
-                body.append("Content-Type: \(contentType)\r\n")
+                body.appendString("Content-Type: \(contentType)\r\n")
             }
             
             // Add empty line before content
-            body.append("\r\n")
+            body.appendString("\r\n")
             
             // Add field data
             body.append(field.data)
-            body.append("\r\n")
+            body.appendString("\r\n")
         }
         
         // Final boundary
         if !pairs.isEmpty {
-            body.append("--\(boundary)--\r\n")
+            body.appendString("--\(boundary)--\r\n")
         }
         return body
     }
