@@ -37,7 +37,7 @@ let package = Package(
         .library(name: .multipartURLFormCodingURLRouting, targets: [.multipartURLFormCodingURLRouting])
     ],
     dependencies: [
-        .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.0.1"),
+        .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.2.0"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.1.5"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.0")
     ],

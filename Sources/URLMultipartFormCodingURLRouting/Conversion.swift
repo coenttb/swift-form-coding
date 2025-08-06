@@ -67,9 +67,10 @@ extension Conversion {
     /// ```
     public static func multipart<Value: Codable>(
         _ type: Value.Type,
-        decoder: Form.Decoder = .init()
+        decoder: Form.Decoder = .init(),
+        encoder: Form.Encoder = .init()
     ) -> Self where Self == Multipart.Conversion<Value> {
-        .init(type, decoder: decoder)
+        .init(type, decoder: decoder, encoder: encoder)
     }
 }
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+@testable import URLFormCoding
 @testable import URLMultipartFormCoding
 
 // MARK: - Basic FileUpload Tests

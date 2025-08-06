@@ -57,6 +57,7 @@ extension Multipart {
     public struct Conversion<Value: Codable> {
         /// The URL form decoder used for parsing input data.
         public let decoder: Form.Decoder
+        public let encoder: Form.Encoder
         
         /// The unique boundary string used to separate multipart fields.
         public let boundary: String
@@ -68,9 +69,11 @@ extension Multipart {
         ///   - decoder: Custom URL form decoder (optional, uses default if not provided)
         public init(
             _ type: Value.Type,
-            decoder: Form.Decoder = .init()
+            decoder: Form.Decoder = .init(),
+            encoder: Form.Encoder = .init()
         ) {
             self.decoder = decoder
+            self.encoder = encoder
             self.boundary = "Boundary-\(UUID().uuidString)"
         }
         
@@ -120,7 +123,6 @@ extension Multipart.Conversion: URLRouting.Conversion {
     public func unapply(_ output: Value) -> Foundation.Data {
         var body = Data()
         
-        let encoder = JSONEncoder()
         guard let fieldData = try? encoder.encode(output),
               var fields = try? JSONSerialization.jsonObject(with: fieldData) as? [String: Any] else {
             return body
