@@ -9,6 +9,8 @@ import Foundation
 import Testing
 import URLFormCoding
 
+// See github.com/coenttb/pointfree-url-form-coding for comprehensive Encoder/Decoder tests
+
 @Suite("URLFormCoding Tests")
 struct URLFormCodingTests {
 }

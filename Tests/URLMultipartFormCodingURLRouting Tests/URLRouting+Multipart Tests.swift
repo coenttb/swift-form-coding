@@ -536,6 +536,115 @@ struct URLRoutingMultipartTests {
 //        }
     }
 
+    // MARK: - Multipart Conversion Bug Fix Tests
+
+    @Suite("Multipart Conversion Bug Fix")
+    struct MultipartConversionBugFixTests {
+        
+        struct UpdateRequest: Sendable, Codable, Equatable {
+            let address: String?
+            let name: String?
+            let vars: [String: String]?
+            let subscribed: Bool?
+        }
+        
+        @Test("Multipart.Conversion produces non-empty body for simple request")
+        func testMultipartConversionProducesNonEmptyBody() {
+            let request = UpdateRequest(
+                address: nil,
+                name: "Updated Name",
+                vars: nil,
+                subscribed: nil
+            )
+            
+            let conversion = Multipart.Conversion(UpdateRequest.self)
+            let body = conversion.unapply(request)
+            
+            // The body should not be empty
+            #expect(body.count > 0, "Multipart body should not be empty")
+            
+            let bodyString = String(data: body, encoding: .utf8) ?? ""
+            
+            // Should contain multipart boundaries
+            #expect(bodyString.contains("--Boundary-"), "Should contain boundary markers")
+            #expect(bodyString.hasSuffix("--\r\n"), "Should have closing boundary")
+            
+            // Should contain the field
+            #expect(bodyString.contains("Content-Disposition: form-data; name=\"name\""), "Should contain name field header")
+            #expect(bodyString.contains("Updated Name"), "Should contain the actual value")
+        }
+        
+        @Test("Multipart.Conversion handles multiple fields correctly")
+        func testMultipartConversionHandlesMultipleFields() {
+            let request = UpdateRequest(
+                address: "test@example.com",
+                name: "John Doe",
+                vars: ["key1": "value1", "key2": "value2"],
+                subscribed: true
+            )
+            
+            let conversion = Multipart.Conversion(UpdateRequest.self)
+            let body = conversion.unapply(request)
+            
+            #expect(body.count > 0, "Multipart body should not be empty")
+            
+            let bodyString = String(data: body, encoding: .utf8) ?? ""
+            
+            // Check for all fields
+            #expect(bodyString.contains("name=\"address\""), "Should contain address field")
+            #expect(bodyString.contains("test@example.com"), "Should contain address value")
+            
+            #expect(bodyString.contains("name=\"name\""), "Should contain name field")
+            #expect(bodyString.contains("John Doe"), "Should contain name value")
+            
+            #expect(bodyString.contains("name=\"subscribed\""), "Should contain subscribed field")
+            #expect(bodyString.contains("true") || bodyString.contains("1"), "Should contain subscribed value")
+            
+            // vars should be encoded somehow - check for at least one of the formats
+            #expect(bodyString.contains("vars") || bodyString.contains("key1"), "Should contain vars data")
+        }
+        
+        @Test("Multipart.Conversion skips nil optional fields")
+        func testMultipartConversionSkipsNilFields() {
+            let request = UpdateRequest(
+                address: nil,
+                name: "Only Name",
+                vars: nil,
+                subscribed: nil
+            )
+            
+            let conversion = Multipart.Conversion(UpdateRequest.self)
+            let body = conversion.unapply(request)
+            
+            let bodyString = String(data: body, encoding: .utf8) ?? ""
+            
+            // Should only contain the name field
+            #expect(bodyString.contains("name=\"name\""), "Should contain name field")
+            #expect(bodyString.contains("Only Name"), "Should contain name value")
+            
+            // Should NOT contain nil fields
+            #expect(!bodyString.contains("name=\"address\""), "Should not contain nil address field")
+            #expect(!bodyString.contains("name=\"vars\""), "Should not contain nil vars field")
+            #expect(!bodyString.contains("name=\"subscribed\""), "Should not contain nil subscribed field")
+        }
+        
+        @Test("Multipart.Conversion handles empty request correctly")
+        func testMultipartConversionHandlesEmptyRequest() {
+            let request = UpdateRequest(
+                address: nil,
+                name: nil,
+                vars: nil,
+                subscribed: nil
+            )
+            
+            let conversion = Multipart.Conversion(UpdateRequest.self)
+            let body = conversion.unapply(request)
+            
+            // Empty request should produce empty body or minimal boundary-only body
+            #expect(body.count == 0 || body.count < 50, "Empty request should produce empty or minimal body")
+        }
+    }
+
     // MARK: - Edge Cases Tests
 
     @Suite("Edge Cases")

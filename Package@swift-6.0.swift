@@ -60,7 +60,9 @@ let package = Package(
         .testTarget(
             name: .urlFormCoding.tests,
             dependencies: [
-                .urlFormCoding
+                .urlFormCoding,
+                .multipartURLFormCoding,
+                .multipartURLFormCodingURLRouting
             ]
         ),
         .target(

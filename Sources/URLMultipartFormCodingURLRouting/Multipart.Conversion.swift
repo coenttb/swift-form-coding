@@ -123,19 +123,36 @@ extension Multipart.Conversion: URLRouting.Conversion {
     public func unapply(_ output: Value) -> Foundation.Data {
         var body = Data()
         
-        guard let fieldData = try? encoder.encode(output),
-              var fields = try? JSONSerialization.jsonObject(with: fieldData) as? [String: Any] else {
+        // Encode the value to URL-encoded form data
+        guard let fieldData = try? encoder.encode(output) else {
             return body
         }
         
-        // Remove null values
-        fields = fields.filter { $0.value is NSNull == false }
+        // Convert URL-encoded data to string
+        guard let urlEncodedString = String(data: fieldData, encoding: .utf8) else {
+            return body
+        }
         
-        for (key, value) in fields {
+        // Parse URL-encoded string into key-value pairs
+        let pairs = urlEncodedString.split(separator: "&")
+        
+        for pair in pairs {
+            let components = pair.split(separator: "=", maxSplits: 1)
+            guard components.count == 2 else { continue }
+            
+            let key = String(components[0])
+            let value = String(components[1])
+            
+            // URL decode the value
+            let decodedValue = value
+                .replacingOccurrences(of: "+", with: " ")
+                .removingPercentEncoding ?? value
+            
+            // Create form field
             let field = Multipart.FormField(
                 name: key,
                 contentType: "text/plain",
-                data: String(describing: value).data(using: .utf8) ?? Data()
+                data: decodedValue.data(using: .utf8) ?? Data()
             )
             
             // Append boundary
@@ -162,7 +179,9 @@ extension Multipart.Conversion: URLRouting.Conversion {
         }
         
         // Final boundary
-        body.append("--\(boundary)--\r\n")
+        if !pairs.isEmpty {
+            body.append("--\(boundary)--\r\n")
+        }
         return body
     }
 }
