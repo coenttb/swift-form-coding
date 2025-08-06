@@ -643,6 +643,54 @@ struct URLRoutingMultipartTests {
             // Empty request should produce empty body or minimal boundary-only body
             #expect(body.count == 0 || body.count < 50, "Empty request should produce empty or minimal body")
         }
+        
+        @Test("Multipart.Conversion unapply throws on encoding failure")
+        func testMultipartConversionThrowsOnEncodingFailure() throws {
+            // Create a type that will fail to encode
+            struct FailingType: Codable {
+                let value: String
+                
+                enum CodingKeys: String, CodingKey {
+                    case value
+                }
+                
+                func encode(to encoder: Encoder) throws {
+                    // Always throw an error when encoding
+                    struct EncodingError: Error {}
+                    throw EncodingError()
+                }
+            }
+            
+            let failingValue = FailingType(value: "test")
+            let conversion = Multipart.Conversion(FailingType.self)
+            
+            // Should throw when trying to encode
+            #expect(throws: Error.self) {
+                _ = try conversion.unapply(failingValue)
+            }
+        }
+        
+        @Test("Multipart.Conversion properly encodes special characters")
+        func testMultipartConversionEncodesSpecialCharacters() throws {
+            struct SpecialCharsRequest: Codable {
+                let field1: String
+                let field2: String
+            }
+            
+            let request = SpecialCharsRequest(
+                field1: "Hello & Goodbye",
+                field2: "Test=Value&Another=Test"
+            )
+            
+            let conversion = Multipart.Conversion(SpecialCharsRequest.self)
+            let body = try conversion.unapply(request)
+            let bodyString = String(data: body, encoding: .utf8) ?? ""
+            
+            // Check that special characters are properly handled
+            #expect(bodyString.contains("Hello & Goodbye") || bodyString.contains("Hello%20%26%20Goodbye"))
+            #expect(bodyString.contains("name=\"field1\""))
+            #expect(bodyString.contains("name=\"field2\""))
+        }
     }
 
     // MARK: - Edge Cases Tests

@@ -25,7 +25,7 @@ struct FileUploadBasicTests {
 
         #expect(!upload.boundary.isEmpty)
         #expect(upload.boundary.hasPrefix("Boundary-"))
-        #expect(upload.boundary.count == 24) // "Boundary-" (9) + 15 random chars
+        #expect(upload.boundary.count == 45) // "Boundary-" (9) + UUID (36)
         #expect(upload.contentType == "multipart/form-data; boundary=\(upload.boundary)")
     }
 
