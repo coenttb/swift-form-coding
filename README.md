@@ -1,30 +1,26 @@
 # Swift URL Form Coding
 
-A powerful, type-safe Swift library for handling web form data encoding/decoding with support for both `application/x-www-form-urlencoded` and `multipart/form-data` formats, featuring seamless URLRouting integration.
+A Swift package for type-safe web form encoding and decoding.
 
-[![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-macOS%2010.15%20|%20iOS%2013%20|%20tvOS%2013%20|%20watchOS%206-blue.svg)](https://swift.org)
-[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+[![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%2013%2B%20|%20macOS%2010.15%2B%20|%20tvOS%2013%2B%20|%20watchOS%206%2B-lightgray.svg)]()
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![CI](https://github.com/coenttb/swift-url-form-coding/workflows/CI/badge.svg)](https://github.com/coenttb/swift-url-form-coding/actions/workflows/ci.yml)
+
+## Overview
+
+Type-safe web form encoding and decoding with support for `application/x-www-form-urlencoded` and `multipart/form-data` formats, featuring seamless URLRouting integration.
 
 ## Features
 
-### 🔒 **Type-Safe Form Handling**
-- **URL Form Encoding/Decoding**: Complete support for `application/x-www-form-urlencoded` data
-- **Multipart Form Data**: RFC 7578 compliant multipart/form-data processing
-- **Custom Parsing Strategies**: Flexible handling of nested objects, arrays, and complex data structures
-- **Swift 6 Compatibility**: Full support for Swift's latest concurrency and type safety features
-
-### 📁 **File Upload Support**
-- **Secure File Handling**: Built-in file upload support with validation
-- **Magic Number Validation**: Automatic file type verification using file signatures
-- **Size Limits**: Configurable file size restrictions with sensible defaults
-- **Predefined File Types**: Built-in support for images, documents, and more
-
-### 🔗 **URLRouting Integration**
-- **Seamless Integration**: First-class support for Point-Free's URLRouting library
-- **Conversion Protocol**: Easy integration with routing systems via the `Conversion` protocol
-- **Type-Safe Routes**: Define routes with compile-time guarantees for form data handling
-- **Chaining Support**: Compose conversions for complex data transformations
+- URL form encoding/decoding with `application/x-www-form-urlencoded` support
+- Multipart form data processing (RFC 7578 compliant)
+- Custom parsing strategies for nested objects, arrays, and complex data structures
+- File upload support with validation, magic number checking, and size limits
+- URLRouting integration via `Conversion` protocol
+- Type-safe routes with compile-time guarantees
+- Conversion chaining for complex data transformations
+- Swift 6.0 compatibility with strict concurrency
 
 ## Quick Start
 
@@ -69,7 +65,6 @@ print(decoded.username) // "john"
 
 ```swift
 import URLRouting
-import URLFormCoding
 import URLFormCodingURLRouting
 
 // Define your data model
@@ -82,13 +77,6 @@ struct LoginRequest: Codable {
 // Create a form conversion
 let loginForm = Conversion.form(LoginRequest.self)
 
-// Use in route definition
-let loginRoute = Route {
-    Method.post
-    Path { "login" }
-    Body(loginForm)
-}
-
 // Handle form data
 let formData = "username=john&password=secret&rememberMe=true"
 let request = try loginForm.apply(Data(formData.utf8))
@@ -99,7 +87,6 @@ print(request.username) // "john"
 
 ```swift
 import URLMultipartFormCoding
-import URLMultipartFormCodingURLRouting
 
 // Define a form field
 let textField = Multipart.FormField(
@@ -115,14 +102,7 @@ let avatarUpload = Multipart.FileUpload(
     maxSize: 2 * 1024 * 1024  // 2MB limit
 )
 
-// Use in route definition
-let uploadRoute = Route {
-    Method.post
-    Path { "upload"; "avatar" }
-    Body(avatarUpload.conversion)
-}
-
-// The conversion automatically validates:
+// The file upload automatically validates:
 // ✅ File size limits
 // ✅ JPEG magic number signature
 // ✅ Content type matching
@@ -338,57 +318,33 @@ do {
 
 ## Testing
 
-The library includes comprehensive test suites:
-
 ```bash
 swift test
 ```
 
-Test coverage includes:
-- ✅ URL form encoding/decoding with various data types
-- ✅ URLRouting integration and conversion protocols
-- ✅ Multipart form field processing
-- ✅ File upload validation and security checks
-- ✅ Error handling scenarios
-- ✅ Custom parsing strategies
-- ✅ Magic number validation for file types
-- ✅ Round-trip data integrity
-- ✅ Edge cases and Unicode handling
-
 ## Requirements
 
-- **Swift**: 6.0+
-- **Platforms**: macOS 10.15+, iOS 13.0+, tvOS 13.0+, watchOS 6.0+
-- **Dependencies**: 
-  - [swift-url-routing](https://github.com/pointfreeco/swift-url-routing) (0.6.0+)
-  - [swift-dependencies](https://github.com/pointfreeco/swift-dependencies) (1.1.5+)
+- Swift 6.0+
+- iOS 13.0+ / macOS 10.15+ / tvOS 13.0+ / watchOS 6.0+
 
-## Contributing
+## Dependencies
 
-Contributions are welcome! Please feel free to:
+- [swift-url-routing](https://github.com/pointfreeco/swift-url-routing) (0.6.0+)
+- [swift-dependencies](https://github.com/pointfreeco/swift-dependencies) (1.1.5+)
+- [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding) (0.2.0+)
 
-1. **Open Issues**: Report bugs or request features
-2. **Submit PRs**: Improve documentation, add features, or fix bugs  
-3. **Share Feedback**: Let us know how you're using the library
+## Related Packages
+
+- [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding) - Form encoder and decoder forked from Point-Free's swift-web
 
 ## Acknowledgements
 
-This project builds upon foundational work by Point-Free (Brandon Williams and Stephen Celis). This package's Form.Encoder and Form.Decoder are forked from their [swift-web](https://github.com/pointfreeco/swift-web) in [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding).
+This package's Form.Encoder and Form.Decoder are forked from Point-Free's [swift-web](https://github.com/pointfreeco/swift-web).
 
 ## License
 
-This project is licensed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for details.
+This package is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
-## Feedback & Support
+## Contributing
 
-Your feedback makes this project better for everyone!
-
-> [Subscribe to my newsletter](http://coenttb.com/en/newsletter/subscribe)
->
-> [Follow me on X](http://x.com/coenttb)
-> 
-> [Connect on LinkedIn](https://www.linkedin.com/in/tenthijeboonkkamp)
-
----
-
-**swift-url-form-coding** - Type-safe web form handling with multipart support and URLRouting integration for modern Swift applications.
+Contributions are welcome! Please open an issue or submit a pull request.
