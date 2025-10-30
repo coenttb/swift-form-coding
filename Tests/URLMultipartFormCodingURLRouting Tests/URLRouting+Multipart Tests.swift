@@ -148,10 +148,10 @@ struct URLRoutingMultipartTests {
 
       // Test that unapply correctly encodes various special characters
       let testCases: [(String, String)] = [
-        ("foo+bar", "foo+bar"),       // Plus sign should be preserved
-        ("foo bar", "foo bar"),       // Space should be preserved
-        ("a=b&c", "a=b&c"),          // Form special chars should be preserved
-        ("test%value", "test%value"), // Percent should be preserved
+        ("foo+bar", "foo+bar"),  // Plus sign should be preserved
+        ("foo bar", "foo bar"),  // Space should be preserved
+        ("a=b&c", "a=b&c"),  // Form special chars should be preserved
+        ("test%value", "test%value"),  // Percent should be preserved
       ]
 
       for (input, expectedInOutput) in testCases {
