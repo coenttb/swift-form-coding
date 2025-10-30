@@ -1,11 +1,9 @@
 # Swift URL Form Coding
 
-A Swift package for type-safe web form encoding and decoding.
-
-[![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-iOS%2013%2B%20|%20macOS%2010.15%2B%20|%20tvOS%2013%2B%20|%20watchOS%206%2B-lightgray.svg)]()
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/coenttb/swift-url-form-coding/workflows/CI/badge.svg)](https://github.com/coenttb/swift-url-form-coding/actions/workflows/ci.yml)
+![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
+
+A Swift package for type-safe web form encoding and decoding.
 
 ## Overview
 
@@ -114,22 +112,18 @@ let avatarUpload = Multipart.FileUpload(
 ```swift
 // Configure decoder for nested objects
 let decoder = Form.Decoder()
-decoder.parsingStrategy = .brackets  // Supports user[profile][name]=value
+decoder.arrayParsingStrategy = .brackets  // Supports user[profile][name]=value
 decoder.dateDecodingStrategy = .iso8601
-decoder.arrayDecodingStrategy = .brackets
+
+let encoder = Form.Encoder()
+encoder.arrayEncodingStrategy = .brackets
 
 // Create form with custom configuration
-let advancedForm = Conversion.form(
+let advancedForm = Form.Conversion(
     ComplexUser.self,
-    decoder: decoder
+    decoder: decoder,
+    encoder: encoder
 )
-
-// Use in route definition
-let complexRoute = Route {
-    Method.post
-    Path { "users" }
-    Body(advancedForm)
-}
 ```
 
 ### Supported Parsing Strategies
