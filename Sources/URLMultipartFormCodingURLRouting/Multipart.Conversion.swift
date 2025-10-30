@@ -169,16 +169,17 @@ extension Multipart.Conversion: URLRouting.Conversion {
       let encodedKey = String(components[0])
       let encodedValue = String(components[1])
 
-      // URL decode both key and value (handle percent encoding first, then + to space)
+      // URL decode both key and value (handle + to space first, then percent decoding)
+      // Order matters: + represents space in URL encoding, %2B represents literal +
       let decodedKey =
         encodedKey
-        .removingPercentEncoding?
-        .replacingOccurrences(of: "+", with: " ") ?? encodedKey
+        .replacingOccurrences(of: "+", with: " ")
+        .removingPercentEncoding ?? encodedKey
 
       let decodedValue =
         encodedValue
-        .removingPercentEncoding?
-        .replacingOccurrences(of: "+", with: " ") ?? encodedValue
+        .replacingOccurrences(of: "+", with: " ")
+        .removingPercentEncoding ?? encodedValue
 
       // Create form field
       guard let valueData = decodedValue.data(using: .utf8) else {

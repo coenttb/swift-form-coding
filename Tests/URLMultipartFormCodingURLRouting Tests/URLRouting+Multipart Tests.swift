@@ -137,6 +137,32 @@ struct URLRoutingMultipartTests {
       // Should not contain nil values (age field should be excluded)
       #expect(!multipartString.contains("name=\"age\""))
     }
+
+    @Test("MultipartFormCoding unapply handles special characters in encoding")
+    func testMultipartFormCodingHandlesSpecialCharactersInEncoding() throws {
+      struct TestModel: Codable {
+        let value: String
+      }
+
+      let multipartCoding = Multipart.Conversion(TestModel.self)
+
+      // Test that unapply correctly encodes various special characters
+      let testCases: [(String, String)] = [
+        ("foo+bar", "foo+bar"),       // Plus sign should be preserved
+        ("foo bar", "foo bar"),       // Space should be preserved
+        ("a=b&c", "a=b&c"),          // Form special chars should be preserved
+        ("test%value", "test%value"), // Percent should be preserved
+      ]
+
+      for (input, expectedInOutput) in testCases {
+        let model = TestModel(value: input)
+        let encoded = try multipartCoding.unapply(model)
+        let multipartString = String(data: encoded, encoding: .utf8)!
+
+        // Verify the value appears correctly in the multipart body
+        #expect(multipartString.contains(expectedInOutput))
+      }
+    }
   }
 
   // MARK: - Multipart.FileUpload Basic Tests
