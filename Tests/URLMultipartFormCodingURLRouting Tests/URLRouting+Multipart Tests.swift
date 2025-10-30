@@ -131,7 +131,8 @@ struct URLRoutingMultipartTests {
       // Should contain non-nil values
       #expect(multipartString.contains("Test User"))
       #expect(multipartString.contains("test@example.com"))
-      #expect(multipartString.contains("1"))  // true is encoded as "1" in multipart
+      // Booleans are encoded as "true"/"false" strings per URL encoding spec
+      #expect(multipartString.contains("true"))
 
       // Should not contain nil values (age field should be excluded)
       #expect(!multipartString.contains("name=\"age\""))

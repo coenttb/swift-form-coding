@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import Shared
 import URLFormCoding
 import URLRouting
 
@@ -192,7 +193,7 @@ struct URLRoutingFormTests {
     @Test("FormCoding handles nested objects")
     func testFormCodingHandlesNestedObjects() throws {
       let decoder = Form.Decoder()
-      decoder.parsingStrategy = .brackets
+      decoder.arrayParsingStrategy = .brackets
 
       let formCoding = Form.Conversion(NestedUser.self, decoder: decoder)
       let queryString = "name=Alice&profile[bio]=Developer&profile[website]=https%3A//example.com"
@@ -208,7 +209,7 @@ struct URLRoutingFormTests {
     @Test("FormCoding handles arrays with accumulate values strategy")
     func testFormCodingHandlesArrays() throws {
       let decoder = Form.Decoder()
-      decoder.parsingStrategy = .accumulateValues
+      decoder.arrayParsingStrategy = .accumulateValues
 
       let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder)
       let queryString =
@@ -360,10 +361,13 @@ struct URLRoutingFormTests {
 
     @Test("FormCoding round-trips arrays with compatible strategies")
     func testFormCodingRoundTripsArrays() throws {
-      let decoder = Form.Decoder()
-      decoder.parsingStrategy = .bracketsWithIndices  // Compatible with encoder output
+      let encoder = Form.Encoder()
+      encoder.arrayEncodingStrategy = .bracketsWithIndices
 
-      let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder)
+      let decoder = Form.Decoder()
+      decoder.arrayParsingStrategy = .bracketsWithIndices  // Compatible with encoder output
+
+      let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder, encoder: encoder)
       let original = UserWithArrays(
         name: "Array User",
         tags: ["swift", "ios", "macos"],
@@ -496,7 +500,7 @@ struct URLRoutingFormTests {
     @Test("FormCoding works with accumulateValues parsing strategy")
     func testFormCodingWorksWithAccumulateValuesStrategy() throws {
       let decoder = Form.Decoder()
-      decoder.parsingStrategy = .accumulateValues
+      decoder.arrayParsingStrategy = .accumulateValues
 
       let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder)
 
@@ -514,7 +518,7 @@ struct URLRoutingFormTests {
     @Test("FormCoding works with brackets parsing strategy")
     func testFormCodingWorksWithBracketsStrategy() throws {
       let decoder = Form.Decoder()
-      decoder.parsingStrategy = .brackets
+      decoder.arrayParsingStrategy = .brackets
 
       let formCoding = Form.Conversion(NestedUser.self, decoder: decoder)
       let original = NestedUser(
@@ -536,10 +540,13 @@ struct URLRoutingFormTests {
 
     @Test("FormCoding works with bracketsWithIndices parsing strategy")
     func testFormCodingWorksWithBracketsWithIndicesStrategy() throws {
-      let decoder = Form.Decoder()
-      decoder.parsingStrategy = .bracketsWithIndices
+      let encoder = Form.Encoder()
+      encoder.arrayEncodingStrategy = .bracketsWithIndices
 
-      let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder)
+      let decoder = Form.Decoder()
+      decoder.arrayParsingStrategy = .bracketsWithIndices
+
+      let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder, encoder: encoder)
       let original = UserWithArrays(
         name: "Indices Test",
         tags: ["swift", "vapor"],
@@ -555,7 +562,7 @@ struct URLRoutingFormTests {
     @Test("FormCoding works with custom parsing strategy")
     func testFormCodingWorksWithCustomParsingStrategy() throws {
       let decoder = Form.Decoder()
-      decoder.parsingStrategy = .custom { query in
+      decoder.arrayParsingStrategy = .custom { query in
         // Simple custom strategy - convert to key-value pairs
         var params: [String: Form.Decoder.Container] = [:]
         let pairs = query.split(separator: "&")
@@ -593,10 +600,13 @@ struct URLRoutingFormTests {
 
     @Test("FormCoding handles large datasets efficiently")
     func testFormCodingHandlesLargeDatasetsEfficiently() throws {
-      let decoder = Form.Decoder()
-      decoder.parsingStrategy = .bracketsWithIndices  // Use compatible strategy
+      let encoder = Form.Encoder()
+      encoder.arrayEncodingStrategy = .bracketsWithIndices
 
-      let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder)
+      let decoder = Form.Decoder()
+      decoder.arrayParsingStrategy = .bracketsWithIndices  // Use compatible strategy
+
+      let formCoding = Form.Conversion(UserWithArrays.self, decoder: decoder, encoder: encoder)
 
       let largeTags = Array(0..<1000).map { "tag\($0)" }
       let largeScores = Array(0..<1000)

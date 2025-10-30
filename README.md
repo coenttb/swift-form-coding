@@ -64,7 +64,6 @@ print(decoded.username) // "john"
 ### URLRouting Integration
 
 ```swift
-import URLRouting
 import URLFormCodingURLRouting
 
 // Define your data model
@@ -75,7 +74,7 @@ struct LoginRequest: Codable {
 }
 
 // Create a form conversion
-let loginForm = Conversion.form(LoginRequest.self)
+let loginForm = Form.Conversion(LoginRequest.self)
 
 // Handle form data
 let formData = "username=john&password=secret&rememberMe=true"
