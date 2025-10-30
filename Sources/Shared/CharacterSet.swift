@@ -8,9 +8,9 @@
 import Foundation
 
 extension CharacterSet {
-    static let urlQueryParamAllowed = CharacterSet
-        .urlQueryAllowed
-        .subtracting(Self(charactersIn: ":#[]@!$&'()*+,;="))
+  static let urlQueryParamAllowed = CharacterSet
+    .urlQueryAllowed
+    .subtracting(Self(charactersIn: ":#[]@!$&'()*+,;="))
 }
 
 //public extension CharacterSet {

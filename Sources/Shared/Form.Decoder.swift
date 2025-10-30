@@ -65,5 +65,5 @@ import PointFreeURLFormCoding
 /// - Note: This decoder is designed to work with ``Form.Encoder`` for round-trip compatibility.
 /// - Important: Choose parsing strategies that match your form data format.
 extension Form {
-    public typealias Decoder = PointFreeURLFormCoding.PointFreeFormDecoder
+  public typealias Decoder = PointFreeURLFormCoding.PointFreeFormDecoder
 }
