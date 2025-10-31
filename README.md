@@ -321,7 +321,20 @@ swift test
 
 ## Related Packages
 
-- [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding) - A fork of Point-Free's swift-web/UrlFormEncoding.
+### Dependencies
+
+- [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding): A fork of Point-Free's swift-web/UrlFormEncoding.
+
+### Used By
+
+- [swift-mailgun-live](https://github.com/coenttb/swift-mailgun-live): A Swift package with live implementations for Mailgun.
+- [swift-types-foundation](https://github.com/coenttb/swift-types-foundation): A Swift package bundling essential type-safe packages for domain modeling.
+- [swift-web-foundation](https://github.com/coenttb/swift-web-foundation): A Swift package with tools to simplify web development.
+
+### Third-Party Dependencies
+
+- [pointfreeco/swift-dependencies](https://github.com/pointfreeco/swift-dependencies): A dependency management library for controlling dependencies in Swift.
+- [pointfreeco/swift-url-routing](https://github.com/pointfreeco/swift-url-routing): A bidirectional URL router with more type safety and less fuss.
 
 ## Acknowledgements
 
