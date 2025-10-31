@@ -328,7 +328,7 @@ swift test
 
 ## Related Packages
 
-- [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding) - Form encoder and decoder forked from Point-Free's swift-web
+- [pointfree-url-form-coding](https://github.com/coenttb/pointfree-url-form-coding) - A fork of Point-Free's swift-web/UrlFormEncoding.
 
 ## Acknowledgements
 
