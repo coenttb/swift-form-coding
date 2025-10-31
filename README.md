@@ -7,7 +7,7 @@ A Swift package for type-safe web form encoding and decoding.
 
 ## Overview
 
-Type-safe web form encoding and decoding with support for `application/x-www-form-urlencoded` and `multipart/form-data` formats, featuring seamless URLRouting integration.
+Type-safe web form encoding and decoding with support for `application/x-www-form-urlencoded` and `multipart/form-data` formats, with URLRouting integration.
 
 ## Features
 
@@ -51,7 +51,6 @@ let decoder = Form.Decoder()
 // Encode to form data
 let request = LoginRequest(username: "john", password: "secret", rememberMe: true)
 let formData = try encoder.encode(request)
-// Result: "username=john&password=secret&rememberMe=true"
 
 // Decode from form data
 let formString = "username=john&password=secret&rememberMe=true"
@@ -85,12 +84,6 @@ print(request.username) // "john"
 ```swift
 import URLMultipartFormCoding
 
-// Define a form field
-let textField = Multipart.FormField(
-    name: "description",
-    value: "User uploaded content"
-)
-
 // Define file upload for user avatars
 let avatarUpload = Multipart.FileUpload(
     fieldName: "avatar",
@@ -100,9 +93,9 @@ let avatarUpload = Multipart.FileUpload(
 )
 
 // The file upload automatically validates:
-// ✅ File size limits
-// ✅ JPEG magic number signature
-// ✅ Content type matching
+// - File size limits
+// - JPEG magic number signature
+// - Content type matching
 ```
 
 ## Advanced Usage
@@ -249,16 +242,16 @@ let upload = Multipart.FileUpload(
 ## Security Features
 
 ### Form Data Security
-- **Input Validation**: Automatic validation of form field types and formats
-- **URL Decoding**: Proper handling of URL-encoded data with security considerations
-- **Memory Safety**: Efficient parsing that prevents buffer overflows
-- **Type Safety**: Compile-time guarantees for form data structure
+- Input Validation: Automatic validation of form field types and formats
+- URL Decoding: Proper handling of URL-encoded data with security considerations
+- Memory Safety: Efficient parsing that prevents buffer overflows
+- Type Safety: Compile-time guarantees for form data structure
 
 ### File Upload Security
-- **Magic Number Validation**: Prevents malicious files disguised as safe formats
-- **Size Limits**: Configurable limits prevent DoS attacks via large files  
-- **Content Type Validation**: Ensures uploaded content matches declared type
-- **Safe Boundary Generation**: Cryptographically secure multipart boundaries
+- Magic Number Validation: Prevents malicious files disguised as safe formats
+- Size Limits: Configurable limits prevent DoS attacks via large files
+- Content Type Validation: Ensures uploaded content matches declared type
+- Safe Boundary Generation: Cryptographically secure multipart boundaries
 
 ## Error Handling
 

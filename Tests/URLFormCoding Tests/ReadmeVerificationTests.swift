@@ -62,9 +62,9 @@ struct ReadmeVerificationTests {
     #expect(request.rememberMe == true)
   }
 
-  // MARK: - Multipart File Upload (Line 85-109)
+  // MARK: - Multipart File Upload (Line 82-99)
 
-  @Test("README Line 85-109: Multipart File Upload")
+  @Test("README Line 82-99: Multipart File Upload")
   func testMultipartFileUpload() {
     // Define file upload for user avatars
     let avatarUpload = Multipart.FileUpload(
@@ -73,6 +73,11 @@ struct ReadmeVerificationTests {
       fileType: .image(.jpeg),
       maxSize: 2 * 1024 * 1024  // 2MB limit
     )
+
+    // The file upload automatically validates:
+    // - File size limits
+    // - JPEG magic number signature
+    // - Content type matching
 
     // Verify file upload properties
     #expect(avatarUpload.contentType.contains("multipart/form-data"))
