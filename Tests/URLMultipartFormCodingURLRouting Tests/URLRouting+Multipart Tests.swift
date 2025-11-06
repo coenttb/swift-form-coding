@@ -112,7 +112,7 @@ struct URLRoutingMultipartTests {
             #expect(multipartString.contains("name=\"age\""))
             #expect(multipartString.contains("25"))
             #expect(multipartString.contains("name=\"isActive\""))
-            #expect(multipartString.contains("0"))  // false is encoded as "0" in multipart
+            #expect(multipartString.contains("false"))
         }
 
         @Test("MultipartFormCoding handles optional values in unapply")
