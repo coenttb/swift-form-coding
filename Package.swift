@@ -25,10 +25,10 @@ extension Target.Dependency {
 let package = Package(
     name: "swift-url-form-coding",
     platforms: [
-      .iOS(.v13),
-      .macOS(.v10_15),
-      .tvOS(.v13),
-      .watchOS(.v6)
+        .iOS(.v13),
+        .macOS(.v10_15),
+        .tvOS(.v13),
+        .watchOS(.v6)
     ],
     products: [
         .library(name: .urlFormCoding, targets: [.urlFormCoding]),

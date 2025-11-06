@@ -599,7 +599,7 @@ struct URLRoutingMultipartTests {
             let body = try conversion.unapply(request)
 
             // The body should not be empty
-            #expect(body.count > 0, "Multipart body should not be empty")
+            #expect(!body.isEmpty, "Multipart body should not be empty")
 
             let bodyString = String(data: body, encoding: .utf8) ?? ""
 
@@ -627,7 +627,7 @@ struct URLRoutingMultipartTests {
             let conversion = Multipart.Conversion(UpdateRequest.self)
             let body = try conversion.unapply(request)
 
-            #expect(body.count > 0, "Multipart body should not be empty")
+            #expect(!body.isEmpty, "Multipart body should not be empty")
 
             let bodyString = String(data: body, encoding: .utf8) ?? ""
 
@@ -695,7 +695,7 @@ struct URLRoutingMultipartTests {
 
             // Empty request should produce empty body or minimal boundary-only body
             #expect(
-                body.count == 0 || body.count < 50,
+                body.isEmpty || body.count < 50,
                 "Empty request should produce empty or minimal body"
             )
         }
