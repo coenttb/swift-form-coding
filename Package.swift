@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.0
 
 import PackageDescription
 
@@ -75,6 +75,7 @@ let package = Package(
         .testTarget(
             name: .urlFormCodingURLRouting.tests,
             dependencies: [
+                .urlFormCoding,
                 .urlFormCodingURLRouting,
                 .dependenciesTestSupport
             ]
@@ -89,6 +90,7 @@ let package = Package(
         .testTarget(
             name: .multipartURLFormCoding.tests,
             dependencies: [
+                .urlFormCoding,
                 .multipartURLFormCoding,
                 .dependenciesTestSupport
             ]
@@ -109,8 +111,7 @@ let package = Package(
                 .dependenciesTestSupport
             ]
         )
-    ],
-    swiftLanguageModes: [.v5]
+    ]
 )
 
 extension String { var tests: Self { self + " Tests" } }
