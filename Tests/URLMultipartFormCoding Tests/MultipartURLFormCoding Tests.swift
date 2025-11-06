@@ -598,26 +598,25 @@ struct PerformanceTests {
 
     @Test("Boundary generation performance")
     func boundaryGenerationPerformance() {
-        let startTime = CFAbsoluteTimeGetCurrent()
+        let clock = ContinuousClock()
+        let elapsed = clock.measure {
+            // Generate 1000 boundaries
+            var boundaries: Set<String> = []
+            for _ in 0..<1000 {
+                let upload = Multipart.FileUpload(
+                    fieldName: "test",
+                    filename: "test.txt",
+                    fileType: .text
+                )
+                boundaries.insert(upload.boundary)
+            }
 
-        // Generate 1000 boundaries
-        var boundaries: Set<String> = []
-        for _ in 0..<1000 {
-            let upload = Multipart.FileUpload(
-                fieldName: "test",
-                filename: "test.txt",
-                fileType: .text
-            )
-            boundaries.insert(upload.boundary)
+            // Ensure all boundaries are unique
+            #expect(boundaries.count == 1000)
         }
 
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-
-        // Ensure all boundaries are unique
-        #expect(boundaries.count == 1000)
-
         // Should complete within reasonable time (less than 1 second)
-        #expect(timeElapsed < 1.0)
+        #expect(elapsed < .seconds(1))
     }
 
     @Test("Large file validation performance")
@@ -630,11 +629,12 @@ struct PerformanceTests {
             maxSize: 2 * 1024 * 1024  // 2MB limit
         )
 
-        let startTime = CFAbsoluteTimeGetCurrent()
-        try upload.validate(largeData)
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+        let clock = ContinuousClock()
+        let elapsed = clock.measure {
+            try! upload.validate(largeData)
+        }
 
         // Validation should be fast even for large files
-        #expect(timeElapsed < 0.1)
+        #expect(elapsed < .milliseconds(100))
     }
 }
