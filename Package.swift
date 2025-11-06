@@ -104,6 +104,7 @@ let package = Package(
         .testTarget(
             name: .multipartURLFormCodingURLRouting.tests,
             dependencies: [
+                .urlFormCoding,
                 .multipartURLFormCodingURLRouting,
                 .dependenciesTestSupport
             ]
