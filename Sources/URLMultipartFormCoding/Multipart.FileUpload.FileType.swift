@@ -56,7 +56,10 @@ extension Multipart.FileUpload.FileType {
     /// - Note: Consider adding magic number validation for enhanced security
     nonisolated(unsafe)
         public static let excel: Self = .init(
-            contentType: RFC_2045.ContentType(type: "application", subtype: "vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+            contentType: RFC_2045.ContentType(
+                type: "application",
+                subtype: "vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
             fileExtension: "xlsx"
         )
 
@@ -129,7 +132,10 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `docx`
     nonisolated(unsafe)
         public static let docx: Self = .init(
-            contentType: RFC_2045.ContentType(type: "application", subtype: "vnd.openxmlformats-officedocument.wordprocessingml.document"),
+            contentType: RFC_2045.ContentType(
+                type: "application",
+                subtype: "vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ),
             fileExtension: "docx"
         )
 

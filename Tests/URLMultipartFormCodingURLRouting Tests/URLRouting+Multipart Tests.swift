@@ -918,7 +918,8 @@ struct URLRoutingMultipartTests {
             // RFC 2046 Section 5.1.1 defines bcharsnospace as:
             // digits / alpha / "'" / "(" / ")" / "+" / "_" / "," / "-" / "." / "/" / ":" / "=" / "?"
             let rfcSafeCharacterSet = CharacterSet(
-                charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()+_,-./:=?"
+                charactersIn:
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()+_,-./:=?"
             )
             let boundaryCharacterSet = CharacterSet(charactersIn: boundary)
 

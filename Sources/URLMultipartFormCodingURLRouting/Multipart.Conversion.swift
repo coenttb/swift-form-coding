@@ -184,7 +184,8 @@ extension Multipart.Conversion: URLRouting.Conversion {
             }
 
             // Sanitize field name to prevent header injection (CR/LF removal)
-            let sanitizedName = decodedKey
+            let sanitizedName =
+                decodedKey
                 .replacingOccurrences(of: "\r", with: "")
                 .replacingOccurrences(of: "\n", with: "")
 
@@ -195,7 +196,7 @@ extension Multipart.Conversion: URLRouting.Conversion {
             let part = RFC_2046.BodyPart(
                 headers: [
                     "Content-Disposition": contentDisposition,
-                    "Content-Type": "text/plain"
+                    "Content-Type": "text/plain",
                 ],
                 content: valueData
             )

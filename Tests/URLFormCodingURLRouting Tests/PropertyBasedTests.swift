@@ -502,7 +502,7 @@ struct PropertyBasedEncodingTests {
         // (application/x-www-form-urlencoded)
         // Note: Spaces are encoded as + in form data, not %20
         let testCases: [(String, String)] = [
-            (" ", "+"),    // Space as + (WHATWG standard for form data)
+            (" ", "+"),  // Space as + (WHATWG standard for form data)
             ("=", "%3D"),  // Equals sign
             ("&", "%26"),  // Ampersand
             ("+", "%2B"),  // Plus sign
