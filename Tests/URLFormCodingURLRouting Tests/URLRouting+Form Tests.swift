@@ -112,7 +112,8 @@ struct URLRoutingFormTests {
             let data = try formCoding.unapply(user)
             let queryString = String(data: data, encoding: .utf8)!
 
-            #expect(queryString.contains("name=Jane%20Doe"))
+            // WHATWG URL Standard: spaces are encoded as + in form data
+            #expect(queryString.contains("name=Jane+Doe"))
             #expect(queryString.contains("age=25"))
             #expect(queryString.contains("isActive=false"))
         }

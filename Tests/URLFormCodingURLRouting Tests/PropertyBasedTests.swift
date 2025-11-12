@@ -498,10 +498,11 @@ struct PropertyBasedEncodingTests {
     func testEncodingUsesProperURLEncoding() throws {
         let conversion = Form.Conversion(StringModel.self)
 
-        // Test specific encoding expectations
-        // Note: Some characters like ? are safe in URL encoding and may not be encoded
+        // Test specific encoding expectations per WHATWG URL Standard
+        // (application/x-www-form-urlencoded)
+        // Note: Spaces are encoded as + in form data, not %20
         let testCases: [(String, String)] = [
-            (" ", "%20"),  // Space as %20
+            (" ", "+"),    // Space as + (WHATWG standard for form data)
             ("=", "%3D"),  // Equals sign
             ("&", "%26"),  // Ampersand
             ("+", "%2B"),  // Plus sign
