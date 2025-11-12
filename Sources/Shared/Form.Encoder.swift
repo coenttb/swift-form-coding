@@ -1,7 +1,6 @@
 // https://github.com/pointfreeco/swift-web/tree/main/Sources/UrlFormEncoding
 
 import Foundation
-import PointFreeURLFormCoding
 
 /// An encoder that converts Swift Codable types to URL-encoded form data.
 ///
@@ -47,5 +46,5 @@ import PointFreeURLFormCoding
 /// - Note: This encoder is designed to work with ``Form.Decoder`` for round-trip compatibility.
 /// - Important: Ensure encoding strategies match your server's expected format.
 extension Form {
-    public typealias Encoder = PointFreeURLFormCoding.PointFreeFormEncoder
+    public typealias Encoder = PointFreeFormEncoder
 }

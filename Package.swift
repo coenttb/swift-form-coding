@@ -18,8 +18,9 @@ extension Target.Dependency {
     static var multipartURLFormCodingURLRouting: Self { .target(name: .multipartURLFormCodingURLRouting) }
     static var rfc2045: Self { .product(name: "RFC 2045", package: "swift-rfc-2045") }
     static var rfc2046: Self { .product(name: "RFC 2046", package: "swift-rfc-2046") }
+    static var rfc2388: Self { .product(name: "RFC 2388", package: "swift-rfc-2388") }
     static var rfc7578: Self { .product(name: "RFC 7578", package: "swift-rfc-7578") }
-    static var pointfreeUrlFormCoding: Self { .product(name: "PointFreeURLFormCoding", package: "pointfree-url-form-coding") }
+    static var whatwgUrlEncoding: Self { .product(name: "WHATWG URL Encoding", package: "swift-whatwg-url-encoding") }
     static var dependencies: Self { .product(name: "Dependencies", package: "swift-dependencies") }
     static var dependenciesTestSupport: Self { .product(name: "DependenciesTestSupport", package: "swift-dependencies") }
     static var urlRouting: Self { .product(name: "URLRouting", package: "swift-url-routing") }
@@ -42,8 +43,9 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/swift-standards/swift-rfc-2045.git", from: "0.1.0"),
         .package(url: "https://github.com/swift-standards/swift-rfc-2046.git", from: "0.1.2"),
+        .package(path: "../../swift-standards/swift-rfc-2388"),
         .package(url: "https://github.com/swift-standards/swift-rfc-7578.git", from: "0.2.1"),
-        .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.5.0"),
+        .package(url: "https://github.com/swift-standards/swift-whatwg-url-encoding.git", from: "0.1.0"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.1.5"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.0")
     ],
@@ -51,7 +53,14 @@ let package = Package(
         .target(
             name: .shared,
             dependencies: [
-                .pointfreeUrlFormCoding
+                .rfc2388,
+                .whatwgUrlEncoding
+            ]
+        ),
+        .testTarget(
+            name: .shared.tests,
+            dependencies: [
+                .shared
             ]
         ),
         .target(
