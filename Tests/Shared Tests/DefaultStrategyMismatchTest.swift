@@ -18,8 +18,8 @@ struct DefaultStrategyMismatchTests {
         )
         
         // Using default encoder (bracketsWithIndices) and decoder (accumulateValues)
-        let encoder = PointFreeFormEncoder()
-        let decoder = PointFreeFormDecoder()
+        let encoder = Form.Encoder()
+        let decoder = Form.Decoder()
         
         // Encode
         let encoded = try encoder.encode(original)
@@ -53,8 +53,8 @@ struct DefaultStrategyMismatchTests {
         
         // Test 1: Both use accumulateValues
         do {
-            let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .accumulateValues)
-            let decoder = PointFreeFormDecoder(arrayParsingStrategy: .accumulateValues)
+            let encoder = Form.Encoder(arrayEncodingStrategy: .accumulateValues)
+            let decoder = Form.Decoder(arrayParsingStrategy: .accumulateValues)
             
             let encoded = try encoder.encode(original)
             let encodedString = String(data: encoded, encoding: .utf8)!
@@ -66,8 +66,8 @@ struct DefaultStrategyMismatchTests {
         
         // Test 2: Both use bracketsWithIndices
         do {
-            let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
-            let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+            let encoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
+            let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
             
             let encoded = try encoder.encode(original)
             let encodedString = String(data: encoded, encoding: .utf8)!
@@ -79,8 +79,8 @@ struct DefaultStrategyMismatchTests {
         
         // Test 3: Both use brackets
         do {
-            let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .brackets)
-            let decoder = PointFreeFormDecoder(arrayParsingStrategy: .brackets)
+            let encoder = Form.Encoder(arrayEncodingStrategy: .brackets)
+            let decoder = Form.Decoder(arrayParsingStrategy: .brackets)
             
             let encoded = try encoder.encode(original)
             let encodedString = String(data: encoded, encoding: .utf8)!
@@ -99,9 +99,9 @@ struct DefaultStrategyMismatchTests {
         )
         
         // Show what each strategy produces
-        let accumulateEncoder = PointFreeFormEncoder(arrayEncodingStrategy: .accumulateValues)
-        let bracketsEncoder = PointFreeFormEncoder(arrayEncodingStrategy: .brackets)
-        let indicesEncoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let accumulateEncoder = Form.Encoder(arrayEncodingStrategy: .accumulateValues)
+        let bracketsEncoder = Form.Encoder(arrayEncodingStrategy: .brackets)
+        let indicesEncoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
         
         let accumulateOutput = String(data: try accumulateEncoder.encode(model), encoding: .utf8)!
         let bracketsOutput = String(data: try bracketsEncoder.encode(model), encoding: .utf8)!

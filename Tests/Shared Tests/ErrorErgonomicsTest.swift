@@ -8,8 +8,8 @@ struct ErrorErgonomicsTest {
     @Test("Strategy mismatch provides clear error message")
     func testStrategyMismatchError() throws {
         // Encode with bracketsWithIndices, decode with accumulateValues
-        let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .accumulateValues)
+        let encoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let decoder = Form.Decoder(arrayParsingStrategy: .accumulateValues)
         
         struct Model: Codable {
             let name: String
@@ -40,7 +40,7 @@ struct ErrorErgonomicsTest {
     
     @Test("Mixed bracket styles provide clear error")
     func testMixedBracketStylesError() throws {
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .brackets)
+        let decoder = Form.Decoder(arrayParsingStrategy: .brackets)
         
         // Mixed styles: empty brackets and indexed brackets
         // RFC 2388 implementation handles mixed styles more gracefully than the old implementation
@@ -66,7 +66,7 @@ struct ErrorErgonomicsTest {
         let accumulateData = "name=Test&tags=swift&tags=ios&tags=server".data(using: .utf8)!
         
         // Try to decode with bracketsWithIndices
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         
         struct Model: Codable {
             let name: String
@@ -119,7 +119,7 @@ struct ErrorErgonomicsTest {
             let metadata: [String: String]
         }
         
-        let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
         let model = ComplexModel(
             id: 1,
             name: "Test",
@@ -132,7 +132,7 @@ struct ErrorErgonomicsTest {
         print("Complex model encoded: \(encodedString)")
         
         // Try to decode with wrong strategy
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .accumulateValues)
+        let decoder = Form.Decoder(arrayParsingStrategy: .accumulateValues)
         
         do {
             _ = try decoder.decode(ComplexModel.self, from: encoded)

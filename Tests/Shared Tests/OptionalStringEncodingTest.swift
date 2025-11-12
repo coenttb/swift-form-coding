@@ -20,7 +20,7 @@ struct OptionalStringEncodingTests {
     
     @Test("Encodes struct with optional strings correctly")
     func testEncodesOptionalStrings() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         // Test with all optionals as nil
         let request1 = RequestWithOptionals(
@@ -64,7 +64,7 @@ struct OptionalStringEncodingTests {
     
     @Test("Handles special characters in optional strings")
     func testSpecialCharactersInOptionals() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         let request = RequestWithOptionals(
             description: "Test & special < > characters",
@@ -85,7 +85,7 @@ struct OptionalStringEncodingTests {
     
     @Test("Reproduce NSError issue with optional encoding")
     func testOptionalEncodingBug() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         // Create a struct that mimics the Mailgun case
         struct TestRequest: Codable {

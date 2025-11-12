@@ -1,6 +1,14 @@
+//
+//  FormDecoder+AutoDetect.swift
+//  swift-url-form-coding
+//
+//  Originally based on Point-Free's UrlFormEncoding from swift-web
+//  https://github.com/pointfreeco/swift-web/tree/main/Sources/UrlFormEncoding
+//
+
 import Foundation
 
-extension PointFreeFormDecoder {
+extension Form.Decoder {
     /// Attempts to detect the parsing strategy from the encoded data
     public static func detectStrategy(from data: Data) -> ArrayParsingStrategy? {
         guard let string = String(data: data, encoding: .utf8) else { return nil }
@@ -45,9 +53,9 @@ extension PointFreeFormDecoder {
         from data: Data,
         dataDecodingStrategy: DataDecodingStrategy = .deferredToData,
         dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
-    ) -> PointFreeFormDecoder {
+    ) -> Form.Decoder {
         let strategy = detectStrategy(from: data) ?? .accumulateValues
-        return PointFreeFormDecoder(
+        return Form.Decoder(
             dataDecodingStrategy: dataDecodingStrategy,
             dateDecodingStrategy: dateDecodingStrategy,
             arrayParsingStrategy: strategy

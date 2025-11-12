@@ -29,7 +29,7 @@ struct DebuggingNSErrorTests {
     
     @Test("Encode Mailgun-like request with all optionals")
     func testMailgunRequest() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         encoder.arrayEncodingStrategy = .bracketsWithIndices
         
         // Test with various combinations
@@ -83,7 +83,7 @@ struct DebuggingNSErrorTests {
     
     @Test("Test encoding error types")
     func testErrorEncoding() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         let request = RequestWithError(
             error: .someError,
@@ -103,7 +103,7 @@ struct DebuggingNSErrorTests {
     
     @Test("Test URL encoding")
     func testURLEncoding() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         let request1 = RequestWithURL(
             url: nil,
@@ -135,7 +135,7 @@ struct DebuggingNSErrorTests {
     
     @Test("Test mixed optional primitives")
     func testMixedOptionalPrimitives() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         // All nil
         let allNil = MixedOptionals(

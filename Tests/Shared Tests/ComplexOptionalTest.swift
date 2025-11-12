@@ -25,7 +25,7 @@ struct ComplexOptionalTests {
     
     @Test("Encode optional complex type")
     func testOptionalComplexType() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         // With nil
         let withNil = WithOptionalComplex(complex: nil, simple: "test")
@@ -65,7 +65,7 @@ struct ComplexOptionalTests {
     
     @Test("Encode weird optional type")
     func testWeirdOptionalType() throws {
-        let encoder = PointFreeFormEncoder()
+        let encoder = Form.Encoder()
         
         let withWeird = WithWeirdOptional(
             weird: WeirdType(),

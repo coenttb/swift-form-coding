@@ -1,10 +1,20 @@
+//
+//  FormEncoder.swift
+//  swift-url-form-coding
+//
+//  Originally based on Point-Free's UrlFormEncoding from swift-web
+//  https://github.com/pointfreeco/swift-web/tree/main/Sources/UrlFormEncoding
+//
+//  Modified to use RFC 2388 for form data encoding
+//
+
 import Foundation
 import WHATWG_URL_Encoding
 import RFC_2388
 
 /// An encoder that converts Swift Codable types to URL-encoded form data.
 ///
-/// `PointFreeFormEncoder` implements the `Encoder` protocol to provide seamless
+/// `Form.Encoder` implements the `Encoder` protocol to provide seamless
 /// conversion from Swift types to `application/x-www-form-urlencoded` format,
 /// the standard format used by HTML forms and many web APIs.
 ///
@@ -17,7 +27,7 @@ import RFC_2388
 ///     let isActive: Bool
 /// }
 ///
-/// let encoder = PointFreeFormEncoder()
+/// let encoder = Form.Encoder()
 /// let user = User(name: "John Doe", age: 30, isActive: true)
 /// let formData = try encoder.encode(user)
 /// // Result: "name=John%20Doe&age=30&isActive=true"
@@ -34,7 +44,7 @@ import RFC_2388
 ///   - `.bracketsWithIndices`: field[0]=value1&field[1]=value2
 ///
 /// ```swift
-/// let encoder = PointFreeFormEncoder()
+/// let encoder = Form.Encoder()
 /// encoder.dateEncodingStrategy = .iso8601
 /// encoder.dataEncodingStrategy = .base64
 /// encoder.encodingStrategy = .brackets // For PHP/Rails compatibility
@@ -47,20 +57,21 @@ import RFC_2388
 /// - Thread-safe encoding operations
 /// - Comprehensive error reporting
 ///
-/// - Note: This encoder is designed to work with ``PointFreeFormDecoder`` for round-trip compatibility.
+/// - Note: This encoder is designed to work with ``Form.Decoder`` for round-trip compatibility.
 /// - Important: Ensure encoding strategies match your server's expected format.
-public final class PointFreeFormEncoder: Swift.Encoder {
+extension Form {
+    public final class Encoder: Swift.Encoder {
     private var container: Container?
     public private(set) var codingPath: [CodingKey] = []
-    public var dataEncodingStrategy: PointFreeFormEncoder.DataEncodingStrategy
-    public var dateEncodingStrategy: PointFreeFormEncoder.DateEncodingStrategy
-    public var arrayEncodingStrategy: PointFreeFormEncoder.ArrayEncodingStrategy
+    public var dataEncodingStrategy: Form.Encoder.DataEncodingStrategy
+    public var dateEncodingStrategy: Form.Encoder.DateEncodingStrategy
+    public var arrayEncodingStrategy: Form.Encoder.ArrayEncodingStrategy
     public let userInfo: [CodingUserInfoKey: Any] = [:]
 
     public init(
-        dataEncodingStrategy: PointFreeFormEncoder.DataEncodingStrategy = .deferredToData,
-        dateEncodingStrategy: PointFreeFormEncoder.DateEncodingStrategy = .deferredToDate,
-        arrayEncodingStrategy: PointFreeFormEncoder.ArrayEncodingStrategy = .accumulateValues
+        dataEncodingStrategy: Form.Encoder.DataEncodingStrategy = .deferredToData,
+        dateEncodingStrategy: Form.Encoder.DateEncodingStrategy = .deferredToDate,
+        arrayEncodingStrategy: Form.Encoder.ArrayEncodingStrategy = .accumulateValues
     ) {
         self.dataEncodingStrategy = dataEncodingStrategy
         self.dateEncodingStrategy = dateEncodingStrategy
@@ -87,7 +98,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
             return .singleValue(String(describing: decimal))
         }
 
-        let encoder = PointFreeFormEncoder(
+        let encoder = Form.Encoder(
             dataEncodingStrategy: self.dataEncodingStrategy,
             dateEncodingStrategy: self.dateEncodingStrategy,
             arrayEncodingStrategy: self.arrayEncodingStrategy
@@ -104,7 +115,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
         let result = self.dateEncodingStrategy.encode(date)
         
         if result == "__DEFERRED_TO_DATE__" {
-            let encoder = PointFreeFormEncoder(
+            let encoder = Form.Encoder(
                 dataEncodingStrategy: self.dataEncodingStrategy,
                 dateEncodingStrategy: self.dateEncodingStrategy,
                 arrayEncodingStrategy: self.arrayEncodingStrategy
@@ -124,7 +135,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
         let result = self.dataEncodingStrategy.encode(data)
         
         if result == "__DEFERRED_TO_DATA__" {
-            let encoder = PointFreeFormEncoder()
+            let encoder = Form.Encoder()
             try data.encode(to: encoder)
             guard let container = encoder.container else {
                 throw Error.encodingError("No container found", encoder.codingPath)
@@ -167,13 +178,13 @@ public final class PointFreeFormEncoder: Swift.Encoder {
     }
 
     struct KeyedContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
-        private let encoder: PointFreeFormEncoder
+        private let encoder: Form.Encoder
 
         var codingPath: [CodingKey] {
             return self.encoder.codingPath
         }
 
-        init(encoder: PointFreeFormEncoder) {
+        init(encoder: Form.Encoder) {
             self.encoder = encoder
         }
 
@@ -221,7 +232,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
     }
 
     struct UnkeyedContainer: UnkeyedEncodingContainer {
-        private let encoder: PointFreeFormEncoder
+        private let encoder: Form.Encoder
 
         var codingPath: [CodingKey] {
             return self.encoder.codingPath
@@ -231,7 +242,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
             return self.encoder.container?.values?.count ?? 0
         }
 
-        init(encoder: PointFreeFormEncoder) {
+        init(encoder: Form.Encoder) {
             self.encoder = encoder
         }
 
@@ -269,11 +280,11 @@ public final class PointFreeFormEncoder: Swift.Encoder {
     }
 
     struct SingleValueContainer: SingleValueEncodingContainer {
-        private let encoder: PointFreeFormEncoder
+        private let encoder: Form.Encoder
 
         var codingPath: [CodingKey] = []
 
-        init(encoder: PointFreeFormEncoder) {
+        init(encoder: Form.Encoder) {
             self.encoder = encoder
         }
 
@@ -360,7 +371,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
     /// ## Custom Strategies
     /// You can create custom strategies by providing your own encoding logic:
     /// ```swift
-    /// extension PointFreeFormEncoder.DataEncodingStrategy {
+    /// extension Form.Encoder.DataEncodingStrategy {
     ///     static let hexEncoding = DataEncodingStrategy { data in
     ///         data.map { String(format: "%02x", $0) }.joined()
     ///     }
@@ -406,7 +417,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
     /// ## Custom Strategies
     /// You can create custom strategies by providing your own encoding logic:
     /// ```swift
-    /// extension PointFreeFormEncoder.DateEncodingStrategy {
+    /// extension Form.Encoder.DateEncodingStrategy {
     ///     static let yearOnly = DateEncodingStrategy { date in
     ///         let formatter = DateFormatter()
     ///         formatter.dateFormat = "yyyy"
@@ -501,7 +512,7 @@ public final class PointFreeFormEncoder: Swift.Encoder {
     /// ## Custom Strategies
     /// You can create custom strategies by providing your own encoding logic:
     /// ```swift
-    /// extension PointFreeFormEncoder.ArrayEncodingStrategy {
+    /// extension Form.Encoder.ArrayEncodingStrategy {
     ///     static let customStrategy = ArrayEncodingStrategy { container, prefix in
     ///         // Your custom encoding logic here
     ///     }
@@ -537,34 +548,35 @@ public final class PointFreeFormEncoder: Swift.Encoder {
             serializeUsingRFC2388(container, strategy: .bracketsWithIndices)
         }
     }
+    }
 }
 
 // MARK: - RFC 2388 Integration
 
-private extension PointFreeFormEncoder {
-    /// Converts PointFreeFormEncoder Container to RFC 2388 FormData
+private extension Form.Encoder {
+    /// Converts Form.Encoder Container to RFC 2388 FormData
     static func convert(_ container: Container) -> RFC_2388.FormData {
         switch container {
         case .singleValue(let str):
             return .value(str)
         case .unkeyed(let items):
-            return .array(items.map(convert))
+            return .array(items.map(Self.convert))
         case .keyed(let dict):
-            return .dictionary(dict.mapValues(convert))
+            return .dictionary(dict.mapValues(Self.convert))
         }
     }
 }
 
-private func serialize(_ container: PointFreeFormEncoder.Container, strategy: PointFreeFormEncoder.ArrayEncodingStrategy, prefix: String = "") -> String {
+private func serialize(_ container: Form.Encoder.Container, strategy: Form.Encoder.ArrayEncodingStrategy, prefix: String = "") -> String {
     return strategy.encode(container, prefix)
 }
 
 /// Serializes a container using RFC 2388 encoding
 private func serializeUsingRFC2388(
-    _ container: PointFreeFormEncoder.Container,
+    _ container: Form.Encoder.Container,
     strategy: RFC_2388.FormData.EncodingStrategy
 ) -> String {
-    let formData = PointFreeFormEncoder.convert(container)
+    let formData = Form.Encoder.convert(container)
     return formData.encode(strategy: strategy, percentEncode: false)
 }
 

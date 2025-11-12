@@ -15,7 +15,7 @@ struct AutoDetectionTest {
             let tags: [String]
         }
         
-        let decoded = try PointFreeFormDecoder.decodeWithAutoDetection(Model.self, from: data)
+        let decoded = try Form.Decoder.decodeWithAutoDetection(Model.self, from: data)
         #expect(decoded.name == "Test")
         #expect(decoded.tags == ["swift", "ios", "server"])
     }
@@ -30,7 +30,7 @@ struct AutoDetectionTest {
             let tags: [String]
         }
         
-        let decoded = try PointFreeFormDecoder.decodeWithAutoDetection(Model.self, from: data)
+        let decoded = try Form.Decoder.decodeWithAutoDetection(Model.self, from: data)
         #expect(decoded.name == "Test")
         #expect(decoded.tags == ["swift", "ios", "server"])
     }
@@ -45,7 +45,7 @@ struct AutoDetectionTest {
             let tags: [String]
         }
         
-        let decoded = try PointFreeFormDecoder.decodeWithAutoDetection(Model.self, from: data)
+        let decoded = try Form.Decoder.decodeWithAutoDetection(Model.self, from: data)
         #expect(decoded.name == "Test")
         #expect(decoded.tags == ["swift", "ios", "server"])
     }
@@ -67,7 +67,7 @@ struct AutoDetectionTest {
             let user: User
         }
         
-        let decoded = try PointFreeFormDecoder.decodeWithAutoDetection(Model.self, from: data)
+        let decoded = try Form.Decoder.decodeWithAutoDetection(Model.self, from: data)
         #expect(decoded.user.name == "John")
         #expect(decoded.user.pets.count == 2)
         #expect(decoded.user.pets[0].name == "Fido")
@@ -86,7 +86,7 @@ struct AutoDetectionTest {
             let city: String
         }
         
-        let decoded = try PointFreeFormDecoder.decodeWithAutoDetection(Model.self, from: data)
+        let decoded = try Form.Decoder.decodeWithAutoDetection(Model.self, from: data)
         #expect(decoded.name == "John")
         #expect(decoded.age == 30)
         #expect(decoded.city == "NYC")
@@ -105,9 +105,9 @@ struct AutoDetectionTest {
         )
         
         // Test with bracketsWithIndices encoding
-        let encoder1 = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let encoder1 = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
         let encoded1 = try encoder1.encode(original)
-        let decoded1 = try PointFreeFormDecoder.decodeWithAutoDetection(Model.self, from: encoded1)
+        let decoded1 = try Form.Decoder.decodeWithAutoDetection(Model.self, from: encoded1)
         #expect(decoded1 == original)
         
         // Test with accumulateValues encoding - this won't work with arrays
@@ -119,9 +119,9 @@ struct AutoDetectionTest {
         }
         
         let simple = SimpleModel(id: 42, name: "Test")
-        let encoder2 = PointFreeFormEncoder(arrayEncodingStrategy: .accumulateValues)
+        let encoder2 = Form.Encoder(arrayEncodingStrategy: .accumulateValues)
         let encoded2 = try encoder2.encode(simple)
-        let decoded2 = try PointFreeFormDecoder.decodeWithAutoDetection(SimpleModel.self, from: encoded2)
+        let decoded2 = try Form.Decoder.decodeWithAutoDetection(SimpleModel.self, from: encoded2)
         #expect(decoded2 == simple)
     }
 }

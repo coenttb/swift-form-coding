@@ -10,7 +10,7 @@ struct BracketsStrategyTests {
     @Test("Arrays with brackets (no indices) strategy")
     func testBracketsWithoutIndices() throws {
         // Test the brackets strategy that uses empty brackets
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .brackets)
+        let decoder = Form.Decoder(arrayParsingStrategy: .brackets)
         
         // Test data like: tags[]=swift&tags[]=ios&tags[]=server
         let queryString = "name=Test&tags[]=swift&tags[]=ios&tags[]=server"
@@ -29,7 +29,7 @@ struct BracketsStrategyTests {
     
     @Test("Nested structures with empty brackets")
     func testNestedBracketsWithoutIndices() throws {
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .brackets)
+        let decoder = Form.Decoder(arrayParsingStrategy: .brackets)
         
         // Test nested data: user[pets][][name]=Fido&user[pets][][name]=Rex
         let queryString = "user[pets][][name]=Fido&user[pets][][name]=Rex"
@@ -55,7 +55,7 @@ struct BracketsStrategyTests {
     
     @Test("Mixed brackets and indices are handled gracefully")
     func testMixedBracketStyles() throws {
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .brackets)
+        let decoder = Form.Decoder(arrayParsingStrategy: .brackets)
 
         // RFC 2388 implementation handles mixed styles gracefully
         let queryString = "tags[]=first&tags[1]=second"
@@ -79,8 +79,8 @@ struct CustomStrategyTests {
     @Test("Custom parsing strategy with special delimiter")
     func testCustomParsingStrategy() throws {
         // Create a custom strategy that uses pipe | as separator
-        let customStrategy: @Sendable (String) -> PointFreeFormDecoder.Container = { query in
-            var params: [String: PointFreeFormDecoder.Container] = [:]
+        let customStrategy: @Sendable (String) -> Form.Decoder.Container = { query in
+            var params: [String: Form.Decoder.Container] = [:]
             let pairs = query.split(separator: "|")
             
             for pair in pairs {
@@ -95,7 +95,7 @@ struct CustomStrategyTests {
             return .keyed(params)
         }
         
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .custom(customStrategy))
+        let decoder = Form.Decoder(arrayParsingStrategy: .custom(customStrategy))
         
         // Use pipe and colon delimiters
         let queryString = "name:John|age:30|city:NYC"
@@ -117,8 +117,8 @@ struct CustomStrategyTests {
     @Test("Custom strategy with array support")
     func testCustomStrategyWithArrays() throws {
         // Custom strategy that handles comma-separated arrays
-        let customStrategy: @Sendable (String) -> PointFreeFormDecoder.Container = { query in
-            var params: [String: PointFreeFormDecoder.Container] = [:]
+        let customStrategy: @Sendable (String) -> Form.Decoder.Container = { query in
+            var params: [String: Form.Decoder.Container] = [:]
             let pairs = query.split(separator: "&")
             
             for pair in pairs {
@@ -130,7 +130,7 @@ struct CustomStrategyTests {
                     // Handle comma-separated arrays
                     if value.contains(",") {
                         let values = value.split(separator: ",").map { 
-                            PointFreeFormDecoder.Container.singleValue(String($0))
+                            Form.Decoder.Container.singleValue(String($0))
                         }
                         params[key] = .unkeyed(values)
                     } else {
@@ -142,7 +142,7 @@ struct CustomStrategyTests {
             return .keyed(params)
         }
         
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .custom(customStrategy))
+        let decoder = Form.Decoder(arrayParsingStrategy: .custom(customStrategy))
         
         let queryString = "name=Test&tags=swift,ios,server"
         let data = queryString.data(using: .utf8)!
@@ -173,7 +173,7 @@ struct ThreadSafetyTests {
         let results = try await withThrowingTaskGroup(of: Data.self) { group in
             for i in 0..<100 {
                 group.addTask {
-                    let encoder = PointFreeFormEncoder() // Create encoder per task
+                    let encoder = Form.Encoder() // Create encoder per task
                     let model = Model(id: i, name: "Test\(i)")
                     return try encoder.encode(model)
                 }
@@ -205,7 +205,7 @@ struct ThreadSafetyTests {
         let results = try await withThrowingTaskGroup(of: Model.self) { group in
             for data in testData {
                 group.addTask {
-                    let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices) // Create decoder per task
+                    let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices) // Create decoder per task
                     return try decoder.decode(Model.self, from: data)
                 }
             }
@@ -225,8 +225,8 @@ struct ThreadSafetyTests {
     @Test("Encoder/Decoder state isolation")
     func testStateIsolation() throws {
         // Ensure encoders don't share state
-        let encoder1 = PointFreeFormEncoder(arrayEncodingStrategy: .accumulateValues)
-        let encoder2 = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let encoder1 = Form.Encoder(arrayEncodingStrategy: .accumulateValues)
+        let encoder2 = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
         
         struct Model: Codable {
             let tags: [String]
@@ -261,7 +261,7 @@ struct URLComponentsIntegrationTests {
         let model = QueryModel(search: "swift", page: 1, filters: ["ios", "macos"])
         
         // Encode model
-        let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
         let data = try encoder.encode(model)
         let queryString = String(data: data, encoding: .utf8)!
         
@@ -274,7 +274,7 @@ struct URLComponentsIntegrationTests {
         
         // Decode back from URLComponents
         if let queryData = components.query?.data(using: .utf8) {
-            let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+            let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
             let decoded = try decoder.decode(QueryModel.self, from: queryData)
             
             #expect(decoded.search == model.search)
@@ -297,7 +297,7 @@ struct URLComponentsIntegrationTests {
         components.queryItems = queryItems
         
         if let query = components.query?.data(using: .utf8) {
-            let decoder = PointFreeFormDecoder(arrayParsingStrategy: .accumulateValues)
+            let decoder = Form.Decoder(arrayParsingStrategy: .accumulateValues)
             
             struct Model: Codable {
                 let name: String
@@ -324,8 +324,8 @@ struct DecimalNumberTests {
             let quantity: Int
         }
         
-        let encoder = PointFreeFormEncoder()
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder()
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         
         let original = Model(price: Decimal(string: "19.99")!, quantity: 2)
         
@@ -343,8 +343,8 @@ struct DecimalNumberTests {
             let normalNumber: Int
         }
         
-        let encoder = PointFreeFormEncoder()
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder()
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         
         // Test with a number too large for Int64
         let largeDecimal = Decimal(string: "999999999999999999999999999.99")!
@@ -363,8 +363,8 @@ struct DecimalNumberTests {
             let precise: Decimal
         }
         
-        let encoder = PointFreeFormEncoder()
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder()
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         
         let original = Model(precise: Decimal(string: "3.141592653589793238462643383279")!)
         
@@ -396,7 +396,7 @@ struct BackwardsCompatibilityTests {
             }
         }
         
-        let decoder = PointFreeFormDecoder()
+        let decoder = Form.Decoder()
         let decoded = try decoder.decode(ModernModel.self, from: data)
         
         #expect(decoded.userName == "John")
@@ -417,7 +417,7 @@ struct BackwardsCompatibilityTests {
             let metadata: [String: String]? // Added in v4
         }
         
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         let decoded = try decoder.decode(CurrentModel.self, from: oldData)
         
         #expect(decoded.id == 123)
@@ -438,10 +438,10 @@ struct ErrorMessageTests {
             let optional: String?
         }
         
-        let decoder = PointFreeFormDecoder()
+        let decoder = Form.Decoder()
         let data = "optional=value".data(using: .utf8)!
         
-        #expect(throws: PointFreeFormDecoder.Error.self) {
+        #expect(throws: Form.Decoder.Error.self) {
             _ = try decoder.decode(Model.self, from: data)
         }
     }
@@ -452,7 +452,7 @@ struct ErrorMessageTests {
             let age: Int
         }
         
-        let decoder = PointFreeFormDecoder()
+        let decoder = Form.Decoder()
         let data = "age=notanumber".data(using: .utf8)!
         
         do {
@@ -476,12 +476,12 @@ struct MixedStrategyTests {
         }
         
         // Encode with one strategy
-        let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
         let model = Model(items: ["a", "b", "c"])
         let encoded = try encoder.encode(model)
         
         // Try to decode with different strategy
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .accumulateValues)
+        let decoder = Form.Decoder(arrayParsingStrategy: .accumulateValues)
         
         // This should fail or produce unexpected results
         #expect(throws: Error.self) {
@@ -499,8 +499,8 @@ struct MixedStrategyTests {
             let items: [String]
         }
         
-        let bracketsDecoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
-        let accumulateDecoder = PointFreeFormDecoder(arrayParsingStrategy: .accumulateValues)
+        let bracketsDecoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
+        let accumulateDecoder = Form.Decoder(arrayParsingStrategy: .accumulateValues)
         
         // Correct combinations should work
         let decoded1 = try bracketsDecoder.decode(Model.self, from: bracketsData)
@@ -533,8 +533,8 @@ struct MemoryPerformanceTests {
         let largeArray = Array(0..<1000)
         let model = Model(items: largeArray)
         
-        let encoder = PointFreeFormEncoder(arrayEncodingStrategy: .bracketsWithIndices)
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder(arrayEncodingStrategy: .bracketsWithIndices)
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         
         let startEncode = Date()
         let encoded = try encoder.encode(model)
@@ -555,8 +555,8 @@ struct MemoryPerformanceTests {
             let data: String
         }
         
-        let encoder = PointFreeFormEncoder()
-        let decoder = PointFreeFormDecoder(arrayParsingStrategy: .bracketsWithIndices)
+        let encoder = Form.Encoder()
+        let decoder = Form.Decoder(arrayParsingStrategy: .bracketsWithIndices)
         
         // Perform multiple encode/decode cycles
         for _ in 0..<100 {

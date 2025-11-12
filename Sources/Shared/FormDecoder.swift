@@ -1,10 +1,20 @@
+//
+//  FormDecoder.swift
+//  swift-url-form-coding
+//
+//  Originally based on Point-Free's UrlFormEncoding from swift-web
+//  https://github.com/pointfreeco/swift-web/tree/main/Sources/UrlFormEncoding
+//
+//  Modified to use RFC 2388 for form data parsing
+//
+
 import Foundation
 import WHATWG_URL_Encoding
 import RFC_2388
 
 /// A decoder that converts URL-encoded form data to Swift Codable types.
 ///
-/// `PointFreeFormDecoder` implements the `Decoder` protocol to provide seamless
+/// `Form.Decoder` implements the `Decoder` protocol to provide seamless
 /// conversion from `application/x-www-form-urlencoded` format to Swift types.
 /// It supports various parsing strategies for handling different form data formats.
 ///
@@ -17,7 +27,7 @@ import RFC_2388
 ///     let isActive: Bool
 /// }
 ///
-/// let decoder = PointFreeFormDecoder()
+/// let decoder = Form.Decoder()
 /// let formData = "name=John%20Doe&age=30&isActive=true".data(using: .utf8)!
 /// let user = try decoder.decode(User.self, from: formData)
 /// ```
@@ -47,7 +57,7 @@ import RFC_2388
 /// ## Configuration
 ///
 /// ```swift
-/// let decoder = PointFreeFormDecoder()
+/// let decoder = Form.Decoder()
 /// decoder.arrayParsingStrategy = .brackets
 /// decoder.dateDecodingStrategy = .iso8601
 /// decoder.dataDecodingStrategy = .base64
@@ -61,23 +71,24 @@ import RFC_2388
 /// - Custom parsing strategy support
 /// - Comprehensive error reporting with coding paths
 ///
-/// - Note: This decoder is designed to work with ``PointFreeFormEncoder`` for round-trip compatibility.
+/// - Note: This decoder is designed to work with ``Form.Encoder`` for round-trip compatibility.
 /// - Important: Choose parsing strategies that match your form data format.
-public final class PointFreeFormDecoder: Swift.Decoder {
+extension Form {
+    public final class Decoder: Swift.Decoder {
     private(set) var containers: [Container] = []
     private var container: Container {
         return containers.last!
     }
     public private(set) var codingPath: [CodingKey] = []
-    public var dataDecodingStrategy: PointFreeFormDecoder.DataDecodingStrategy
-    public var dateDecodingStrategy: PointFreeFormDecoder.DateDecodingStrategy
-    public var arrayParsingStrategy: PointFreeFormDecoder.ArrayParsingStrategy
+    public var dataDecodingStrategy: Form.Decoder.DataDecodingStrategy
+    public var dateDecodingStrategy: Form.Decoder.DateDecodingStrategy
+    public var arrayParsingStrategy: Form.Decoder.ArrayParsingStrategy
     public let userInfo: [CodingUserInfoKey: Any] = [:]
 
     public init(
-        dataDecodingStrategy: PointFreeFormDecoder.DataDecodingStrategy = .deferredToData,
-        dateDecodingStrategy: PointFreeFormDecoder.DateDecodingStrategy = .deferredToDate,
-        arrayParsingStrategy: PointFreeFormDecoder.ArrayParsingStrategy = .accumulateValues
+        dataDecodingStrategy: Form.Decoder.DataDecodingStrategy = .deferredToData,
+        dateDecodingStrategy: Form.Decoder.DateDecodingStrategy = .deferredToDate,
+        arrayParsingStrategy: Form.Decoder.ArrayParsingStrategy = .accumulateValues
     ) {
         self.dataDecodingStrategy = dataDecodingStrategy
         self.dateDecodingStrategy = dateDecodingStrategy
@@ -205,7 +216,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
     }
 
     struct KeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
-        private(set) var decoder: PointFreeFormDecoder
+        private(set) var decoder: Form.Decoder
         let container: [String: Container]
 
         var codingPath: [CodingKey] {
@@ -466,7 +477,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
             guard let container = self.container[key.stringValue] else {
                 throw Error.decodingError("Expected value at \(key), got nil", self.codingPath)
             }
-            let decoder = PointFreeFormDecoder()
+            let decoder = Form.Decoder()
             decoder.containers = [container]
             decoder.codingPath = self.codingPath
             decoder.dataDecodingStrategy = self.decoder.dataDecodingStrategy
@@ -481,7 +492,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
             let index: Int
         }
 
-        let decoder: PointFreeFormDecoder
+        let decoder: Form.Decoder
         let container: [Container]
 
         private(set) var codingPath: [CodingKey]
@@ -493,7 +504,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
         }
         private(set) var currentIndex: Int = 0
 
-        init(decoder: PointFreeFormDecoder, container: [Container], codingPath: [CodingKey]) {
+        init(decoder: Form.Decoder, container: [Container], codingPath: [CodingKey]) {
             self.decoder = decoder
             self.container = container
             self.codingPath = codingPath
@@ -628,7 +639,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
             defer { self.codingPath.removeLast() }
             let container = self.container[self.currentIndex]
             self.currentIndex += 1
-            let decoder = PointFreeFormDecoder()
+            let decoder = Form.Decoder()
             decoder.containers = [container]
             decoder.codingPath = self.codingPath
             decoder.dataDecodingStrategy = self.decoder.dataDecodingStrategy
@@ -639,7 +650,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
     }
 
     struct SingleValueContainer: SingleValueDecodingContainer {
-        let decoder: PointFreeFormDecoder
+        let decoder: Form.Decoder
         let container: Container
 
         let codingPath: [CodingKey] = []
@@ -740,7 +751,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
     /// ## Custom Strategies
     /// You can create custom strategies by providing your own decoding logic:
     /// ```swift
-    /// extension PointFreeFormDecoder.DataDecodingStrategy {
+    /// extension Form.Decoder.DataDecodingStrategy {
     ///     static let hexDecoding = DataDecodingStrategy { string in
     ///         // Convert hex string to Data
     ///         var data = Data()
@@ -795,7 +806,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
     /// ## Custom Strategies
     /// You can create custom strategies by providing your own decoding logic:
     /// ```swift
-    /// extension PointFreeFormDecoder.DateDecodingStrategy {
+    /// extension Form.Decoder.DateDecodingStrategy {
     ///     static let yearOnly = DateDecodingStrategy { string in
     ///         let formatter = DateFormatter()
     ///         formatter.dateFormat = "yyyy"
@@ -893,7 +904,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
     /// ## Custom Strategies
     /// You can create custom strategies by providing your own parsing logic:
     /// ```swift
-    /// extension PointFreeFormDecoder.ArrayParsingStrategy {
+    /// extension Form.Decoder.ArrayParsingStrategy {
     ///     static let customStrategy = ArrayParsingStrategy { query in
     ///         // Your custom parsing logic here
     ///         // Return a Container
@@ -924,7 +935,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
         /// - Note: This parsing strategy is "flat" and cannot decode deeper structures.
         /// - Implementation: Uses RFC 2388 FormData.ParsingStrategy.accumulateValues
         public static let accumulateValues = ArrayParsingStrategy(
-            parse: PointFreeFormDecoder.parseUsingRFC2388(strategy: .accumulateValues),
+            parse: Form.Decoder.parseUsingRFC2388(strategy: .accumulateValues),
             handleSingleValue: true
         )
 
@@ -949,7 +960,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
         ///   structures by using multiple keys. See `bracketsWithIndices` as an alternative parsing strategy.
         /// - Implementation: Uses RFC 2388 FormData.ParsingStrategy.brackets
         public static let brackets = ArrayParsingStrategy(
-            parse: PointFreeFormDecoder.parseUsingRFC2388(strategy: .brackets)
+            parse: Form.Decoder.parseUsingRFC2388(strategy: .brackets)
         )
 
         /// A parsing strategy that uses keys with a bracketed suffix to produce nested structures.
@@ -970,7 +981,7 @@ public final class PointFreeFormDecoder: Swift.Decoder {
         ///     // Parsed as ["user": ["pets": [["id": "1"], ["name": "Fido"]]]]
         /// - Implementation: Uses RFC 2388 FormData.ParsingStrategy.bracketsWithIndices
         public static let bracketsWithIndices = ArrayParsingStrategy(
-            parse: PointFreeFormDecoder.parseUsingRFC2388(strategy: .bracketsWithIndices, sort: true)
+            parse: Form.Decoder.parseUsingRFC2388(strategy: .bracketsWithIndices, sort: true)
         )
         
         /// Creates a custom parsing strategy with a custom function.
@@ -979,9 +990,10 @@ public final class PointFreeFormDecoder: Swift.Decoder {
             return ArrayParsingStrategy(parse: parseFunction)
         }
     }
+    }
 }
 
-extension PointFreeFormDecoder.UnkeyedContainer.Key: CodingKey {
+extension Form.Decoder.UnkeyedContainer.Key: CodingKey {
     public var stringValue: String {
         return String(self.index)
     }
@@ -1023,17 +1035,17 @@ private let iso8601DateFormatterWithoutMilliseconds: DateFormatter = {
 
 // MARK: - RFC 2388 Integration
 
-private extension PointFreeFormDecoder {
-    /// Converts RFC 2388 FormData to PointFreeFormDecoder Container
+private extension Form.Decoder {
+    /// Converts RFC 2388 FormData to Form.Decoder Container
     @Sendable
     static func convert(_ formData: RFC_2388.FormData) -> Container {
         switch formData {
         case .value(let str):
             return .singleValue(str)
         case .array(let items):
-            return .unkeyed(items.map(convert))
+            return .unkeyed(items.map(Self.convert))
         case .dictionary(let dict):
-            return .keyed(dict.mapValues(convert))
+            return .keyed(dict.mapValues(Self.convert))
         }
     }
 
