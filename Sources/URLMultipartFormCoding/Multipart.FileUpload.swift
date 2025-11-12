@@ -55,7 +55,7 @@ import RFC_2046
 /// - Important: Always validate file content server-side even with client-side restrictions.
 /// - Note: The conversion validates file content during both `apply` and `unapply` operations.
 extension Multipart {
-    public struct FileUpload {
+    public struct FileUpload: Sendable {
 
         /// The unique boundary string used to separate multipart fields.
         public let boundary: String
@@ -99,6 +99,13 @@ extension Multipart {
             fileType: FileType,
             maxSize: Int = Multipart.FileUpload.maxFileSize
         ) {
+            precondition(!fieldName.isEmpty, "fieldName cannot be empty")
+            precondition(!filename.isEmpty, "filename cannot be empty")
+            precondition(!filename.contains("/") && !filename.contains("\\"),
+                         "filename cannot contain path separators")
+            precondition(maxSize > 0, "maxSize must be positive")
+            precondition(maxSize <= 1024 * 1024 * 1024, "maxSize exceeds maximum (1GB)")
+
             self.fieldName = fieldName
             self.filename = filename
             self.fileType = fileType
@@ -198,7 +205,7 @@ extension Multipart.FileUpload {
     ///     }
     /// }
     /// ```
-    public struct FileType {
+    public struct FileType: Sendable {
         /// The RFC 2045 Content-Type for this file format.
         public let contentType: RFC_2045.ContentType
 
@@ -206,7 +213,7 @@ extension Multipart.FileUpload {
         public let fileExtension: String
 
         /// Validation function that checks if data matches this file type.
-        let validate: (Foundation.Data) throws -> Void
+        let validate: @Sendable (Foundation.Data) throws -> Void
 
         /// Creates a new file type specification.
         ///
@@ -217,7 +224,7 @@ extension Multipart.FileUpload {
         public init(
             contentType: RFC_2045.ContentType,
             fileExtension: String,
-            validate: @escaping (Foundation.Data) throws -> Void = { _ in }
+            validate: @escaping @Sendable (Foundation.Data) throws -> Void = { _ in }
         ) {
             self.contentType = contentType
             self.fileExtension = fileExtension
@@ -255,7 +262,7 @@ extension Multipart.FileUpload.FileType {
     /// Each image type validates the file's magic numbers (binary signature)
     /// to ensure the file content matches the declared format, preventing
     /// security vulnerabilities from disguised malicious files.
-    public struct ImageType {
+    public struct ImageType: Sendable {
         /// The RFC 2045 Content-Type for this image format.
         public let contentType: RFC_2045.ContentType
 
@@ -263,7 +270,7 @@ extension Multipart.FileUpload.FileType {
         public let fileExtension: String
 
         /// Validation function that checks magic numbers for this image type.
-        let validate: (Foundation.Data) throws -> Void
+        let validate: @Sendable (Foundation.Data) throws -> Void
 
         /// Creates a new image type specification.
         ///
@@ -274,7 +281,7 @@ extension Multipart.FileUpload.FileType {
         public init(
             contentType: RFC_2045.ContentType,
             fileExtension: String,
-            validate: @escaping (Foundation.Data) throws -> Void = { _ in }
+            validate: @escaping @Sendable (Foundation.Data) throws -> Void = { _ in }
         ) {
             self.contentType = contentType
             self.fileExtension = fileExtension
@@ -316,7 +323,7 @@ extension Multipart.FileUpload {
     ///     }
     /// }
     /// ```
-    public enum MultipartError: Equatable, LocalizedError {
+    public enum MultipartError: Equatable, Sendable, LocalizedError {
         /// File size exceeds the configured maximum.
         ///
         /// - Parameters:

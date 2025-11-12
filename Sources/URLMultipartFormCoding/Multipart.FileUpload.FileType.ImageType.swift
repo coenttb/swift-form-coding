@@ -18,8 +18,7 @@ extension Multipart.FileUpload.FileType.ImageType {
     ///
     /// The validation checks the first 3 bytes of the file for the JPEG
     /// Start of Image (SOI) marker followed by the Application marker.
-    nonisolated(unsafe)
-        public static let jpeg = Self(
+    public static let jpeg = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "jpeg"),
             fileExtension: "jpg"
         ) { (data: Foundation.Data) in
@@ -49,8 +48,7 @@ extension Multipart.FileUpload.FileType.ImageType {
     /// - PNG identifier ("PNG")
     /// - DOS-style line ending (CRLF)
     /// - DOS end-of-file character and Unix line ending
-    nonisolated(unsafe)
-        public static let png = Self(
+    public static let png = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "png"),
             fileExtension: "png"
         ) { (data: Foundation.Data) in
@@ -76,13 +74,12 @@ extension Multipart.FileUpload.FileType.ImageType {
     ///
     /// - **GIF87a**: Original 1987 specification
     /// - **GIF89a**: Enhanced 1989 specification with animation support
-    nonisolated(unsafe)
-        public static let gif = Self(
+    public static let gif = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "gif"),
             fileExtension: "gif"
         ) { (data: Foundation.Data) in
-            let gif87a = "GIF87a".data(using: .ascii)!
-            let gif89a = "GIF89a".data(using: .ascii)!
+            let gif87a = Data("GIF87a".utf8)
+            let gif89a = Data("GIF89a".utf8)
             guard data.prefix(6).elementsEqual(gif87a) || data.prefix(6).elementsEqual(gif89a)
             else {
                 throw Multipart.FileUpload.MultipartError.contentMismatch(
@@ -108,13 +105,12 @@ extension Multipart.FileUpload.FileType.ImageType {
     /// - Bytes 0-3: "RIFF" (container identifier)
     /// - Bytes 4-7: File size (little-endian)
     /// - Bytes 8-11: "WEBP" (format identifier)
-    nonisolated(unsafe)
-        public static let webp = Self(
+    public static let webp = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "webp"),
             fileExtension: "webp"
         ) { (data: Foundation.Data) in
-            let riffMagic = "RIFF".data(using: .ascii)!
-            let webpMagic = "WEBP".data(using: .ascii)!
+            let riffMagic = Data("RIFF".utf8)
+            let webpMagic = Data("WEBP".utf8)
             guard
                 data.prefix(4).elementsEqual(riffMagic)
                     && data.dropFirst(8).prefix(4).elementsEqual(webpMagic)
@@ -140,8 +136,7 @@ extension Multipart.FileUpload.FileType.ImageType {
     /// TIFF files can use either byte ordering:
     /// - **Intel**: `49 49 2A 00` (little-endian)
     /// - **Motorola**: `4D 4D 00 2A` (big-endian)
-    nonisolated(unsafe)
-        public static let tiff = Self(
+    public static let tiff = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "tiff"),
             fileExtension: "tiff"
         ) { (data: Foundation.Data) in
@@ -172,8 +167,7 @@ extension Multipart.FileUpload.FileType.ImageType {
     /// BMP files begin with a simple 2-byte signature:
     /// - "BM" indicates a Windows bitmap file
     /// - Other variants like "BA", "CI", "CP", "IC", "PT" exist but are rare
-    nonisolated(unsafe)
-        public static let bmp = Self(
+    public static let bmp = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "bmp"),
             fileExtension: "bmp"
         ) { (data: Foundation.Data) in
@@ -203,8 +197,7 @@ extension Multipart.FileUpload.FileType.ImageType {
     ///
     /// - Note: This validation is basic due to HEIC's complex container format.
     ///   More sophisticated validation could check additional brand compatibility.
-    nonisolated(unsafe)
-        public static let heic = Self(
+    public static let heic = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "heic"),
             fileExtension: "heic"
         ) { (data: Foundation.Data) in
@@ -241,8 +234,7 @@ extension Multipart.FileUpload.FileType.ImageType {
     /// - Lossless and lossy compression modes
     ///
     /// Like HEIC, it uses an ISOBMFF container format.
-    nonisolated(unsafe)
-        public static let avif = Self(
+    public static let avif = Self(
             contentType: RFC_2045.ContentType(type: "image", subtype: "avif"),
             fileExtension: "avif"
         ) { (data: Foundation.Data) in

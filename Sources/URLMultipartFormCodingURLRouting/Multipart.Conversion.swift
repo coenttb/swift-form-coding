@@ -6,15 +6,6 @@ import Shared
 import URLMultipartFormCoding
 import URLRouting
 
-// Helper extension for efficient string appending to Data
-extension Data {
-    fileprivate mutating func appendString(_ string: String) {
-        if let data = string.data(using: .utf8, allowLossyConversion: false) {
-            self.append(data)
-        }
-    }
-}
-
 // Error types for multipart encoding failures
 private struct InvalidUTF8Error: Error, LocalizedError {
     var errorDescription: String? {
@@ -80,7 +71,7 @@ private struct InvalidFieldDataError: Error, LocalizedError {
 /// - Important: The `apply` method expects URL-encoded form data, not actual multipart data.
 ///   For true multipart parsing, use ``Multipart.FileUpload.Conversion``.
 extension Multipart {
-    public struct Conversion<Value: Codable> {
+    public struct Conversion<Value: Codable>: @unchecked Sendable {
         /// The URL form decoder used for parsing input data.
         public let decoder: Form.Decoder
         public let encoder: Form.Encoder

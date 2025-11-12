@@ -8,7 +8,7 @@
 import Foundation
 
 extension Multipart.FileUpload {
-    public struct Data {
+    public struct Data: Sendable {
         let fieldName: String
         let filename: String
         let fileType: Multipart.FileUpload.FileType

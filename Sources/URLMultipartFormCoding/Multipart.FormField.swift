@@ -22,7 +22,7 @@ import Foundation
 /// )
 /// ```
 extension Multipart {
-    public struct FormField {
+    public struct FormField: Sendable {
         /// The name of the form field.
         public let name: String
 
