@@ -1,5 +1,6 @@
 import Foundation
 import RFC_2045
+import RFC_2046
 
 /// A conversion that handles file uploads in multipart/form-data format.
 ///
@@ -102,19 +103,8 @@ extension Multipart {
             self.filename = filename
             self.fileType = fileType
             self.maxSize = maxSize
-            self.boundary = Self.generateBoundary()
-        }
-
-        /// Generates a cryptographically safe boundary string for multipart data.
-        ///
-        /// Uses UUID for maximum uniqueness and security. The boundary format
-        /// follows RFC 2046 recommendations for multipart boundaries.
-        ///
-        /// - Returns: A unique boundary string safe for multipart usage
-        private static func generateBoundary() -> String {
-            // Use UUID for boundary generation - provides 36 characters of uniqueness
-            // This ensures the boundary is extremely unlikely to appear in content
-            return "Boundary-\(UUID().uuidString)"
+            // Use RFC 2046's boundary generation for RFC compliance
+            self.boundary = RFC_2046.Multipart.generateBoundary()
         }
 
         public func validate(_ data: Foundation.Data) throws {

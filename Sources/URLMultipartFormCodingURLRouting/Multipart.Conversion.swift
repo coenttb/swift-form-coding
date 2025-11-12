@@ -1,4 +1,7 @@
 import Foundation
+import RFC_2045
+import RFC_2046
+import RFC_7578
 import Shared
 import URLMultipartFormCoding
 import URLRouting
@@ -98,10 +101,8 @@ extension Multipart {
         ) {
             self.decoder = decoder
             self.encoder = encoder
-            // Use UUID for boundary generation - provides 36 characters of uniqueness
-            // Format: "Boundary-UUID" where UUID is 36 chars (including hyphens)
-            // This gives us a boundary that's highly unlikely to appear in content
-            self.boundary = "Boundary-\(UUID().uuidString)"
+            // Use RFC 2046's boundary generation for RFC compliance
+            self.boundary = RFC_2046.Multipart.generateBoundary()
         }
 
         /// The Content-Type header value for multipart/form-data requests.
@@ -131,26 +132,19 @@ extension Multipart.Conversion: URLRouting.Conversion {
     /// Converts a Swift value to multipart form data.
     ///
     /// This method serializes the Swift value to URL-encoded format, then converts each field
-    /// to a multipart form field with appropriate headers and boundaries.
+    /// to an RFC 2046 body part using RFC 7578 form-data conventions.
     ///
     /// - Parameter output: The Swift value to encode
     /// - Returns: The multipart form data as `Data`
     /// - Throws: An error if encoding fails
     ///
-    /// ## Multipart Format
+    /// ## RFC Compliance
     ///
-    /// The generated data follows RFC 7578 multipart/form-data format:
-    /// ```
-    /// --Boundary-<UUID>
-    /// Content-Disposition: form-data; name="fieldName"
-    /// Content-Type: text/plain
-    ///
-    /// fieldValue
-    /// --Boundary-<UUID>--
-    /// ```
+    /// Uses RFC 2046 for multipart structure and RFC 7578 for form-data specifics:
+    /// - Boundary generation via RFC 2046
+    /// - Content-Disposition escaping via RFC 7578
+    /// - Proper multipart rendering via RFC 2046
     public func unapply(_ output: Value) throws -> Foundation.Data {
-        var body = Data()
-
         // Encode the value to URL-encoded form data
         let fieldData = try encoder.encode(output)
 
@@ -161,6 +155,9 @@ extension Multipart.Conversion: URLRouting.Conversion {
 
         // Parse URL-encoded string into key-value pairs
         let pairs = urlEncodedString.split(separator: "&")
+
+        // Create RFC 2046 body parts for each field
+        var bodyParts: [RFC_2046.BodyPart] = []
 
         for pair in pairs {
             let components = pair.split(separator: "=", maxSplits: 1)
@@ -181,56 +178,45 @@ extension Multipart.Conversion: URLRouting.Conversion {
                 .replacingOccurrences(of: "+", with: " ")
                 .removingPercentEncoding ?? encodedValue
 
-            // Create form field
+            // Create form field value data
             guard let valueData = decodedValue.data(using: .utf8) else {
                 throw InvalidFieldDataError(fieldName: decodedKey)
             }
 
-            let field = Multipart.FormField(
-                name: decodedKey,
-                contentType: "text/plain",
-                data: valueData
-            )
-
-            // Sanitize field name to prevent header injection
-            let sanitizedName = field.name
+            // Sanitize field name to prevent header injection (CR/LF removal)
+            let sanitizedName = decodedKey
                 .replacingOccurrences(of: "\r", with: "")
                 .replacingOccurrences(of: "\n", with: "")
-                .replacingOccurrences(of: "\"", with: "'")
 
-            // Append boundary
-            body.appendString("--\(boundary)\r\n")
+            // Use RFC 7578 Content-Disposition escaping
+            let contentDisposition = RFC_7578.FormData.escapeContentDisposition(name: sanitizedName)
 
-            // Add Content-Disposition header
-            var disposition = "Content-Disposition: form-data; name=\"\(sanitizedName)\""
-            if let filename = field.filename {
-                // Sanitize filename as well
-                let sanitizedFilename =
-                    filename
-                    .replacingOccurrences(of: "\r", with: "")
-                    .replacingOccurrences(of: "\n", with: "")
-                    .replacingOccurrences(of: "\"", with: "'")
-                disposition += "; filename=\"\(sanitizedFilename)\""
-            }
-            body.appendString("\(disposition)\r\n")
+            // Create RFC 2046 body part with proper headers
+            let part = RFC_2046.BodyPart(
+                headers: [
+                    "Content-Disposition": contentDisposition,
+                    "Content-Type": "text/plain"
+                ],
+                content: valueData
+            )
 
-            // Add Content-Type if specified
-            if let contentType = field.contentType {
-                body.appendString("Content-Type: \(contentType)\r\n")
-            }
-
-            // Add empty line before content
-            body.appendString("\r\n")
-
-            // Add field data
-            body.append(field.data)
-            body.appendString("\r\n")
+            bodyParts.append(part)
         }
 
-        // Final boundary
-        if !pairs.isEmpty {
-            body.appendString("--\(boundary)--\r\n")
+        // Use RFC 2046 to construct the multipart message
+        guard !bodyParts.isEmpty else {
+            // Empty body case
+            return Data()
         }
-        return body
+
+        let multipart = try RFC_2046.Multipart(
+            subtype: .formData,
+            parts: bodyParts,
+            boundary: boundary
+        )
+
+        // Render using RFC 2046's render method
+        let rendered = multipart.render()
+        return Data(rendered.utf8)
     }
 }

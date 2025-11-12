@@ -25,8 +25,8 @@ struct FileUploadBasicTests {
         )
 
         #expect(!upload.boundary.isEmpty)
-        #expect(upload.boundary.hasPrefix("Boundary-"))
-        #expect(upload.boundary.count == 45)  // "Boundary-" (9) + UUID (36)
+        #expect(upload.boundary.hasPrefix("----=_Part_"))
+        #expect(upload.boundary.count == 47)  // "----=_Part_" (11) + UUID (36)
         #expect(upload.contentType == "multipart/form-data; boundary=\(upload.boundary)")
     }
 
@@ -387,7 +387,7 @@ struct MultipartFormatTests {
 
         let boundaryString = String(data: data, encoding: .utf8)!
         #expect(boundaryString == "--\(upload.boundary)\r\n")
-        #expect(boundaryString.hasPrefix("--Boundary-"))
+        #expect(boundaryString.hasPrefix("------=_Part_"))
         #expect(boundaryString.hasSuffix("\r\n"))
     }
 
@@ -423,7 +423,7 @@ struct MultipartFormatTests {
 
         let closingString = String(data: data, encoding: .utf8)!
         #expect(closingString == "\r\n--\(upload.boundary)--\r\n")
-        #expect(closingString.hasPrefix("\r\n--Boundary-"))
+        #expect(closingString.hasPrefix("\r\n------=_Part_"))
         #expect(closingString.hasSuffix("--\r\n"))
     }
 }

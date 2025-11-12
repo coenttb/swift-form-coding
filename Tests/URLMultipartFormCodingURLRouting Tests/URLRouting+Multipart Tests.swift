@@ -80,7 +80,7 @@ struct URLRoutingMultipartTests {
             let contentType = multipartCoding.contentType
 
             #expect(contentType.hasPrefix("multipart/form-data; boundary="))
-            #expect(contentType.contains("Boundary-"))
+            #expect(contentType.contains("----=_Part_"))
         }
 
         @Test("MultipartFormCoding apply method decodes form data")
@@ -105,7 +105,7 @@ struct URLRoutingMultipartTests {
             let multipartString = String(data: data, encoding: .utf8)!
 
             // Should contain multipart boundaries and headers
-            #expect(multipartString.contains("--Boundary-"))
+            #expect(multipartString.contains("------=_Part_"))
             #expect(multipartString.contains("Content-Disposition: form-data"))
             #expect(multipartString.contains("name=\"name\""))
             #expect(multipartString.contains("Jane Doe"))
@@ -221,7 +221,7 @@ struct URLRoutingMultipartTests {
                 let headerString = String(data: headerData, encoding: .utf8)!
 
                 // Should contain multipart structure in headers
-                #expect(headerString.contains("--Boundary-"))
+                #expect(headerString.contains("------=_Part_"))
                 #expect(headerString.contains("Content-Disposition: form-data"))
                 #expect(headerString.contains("name=\"avatar\""))
                 #expect(headerString.contains("filename=\"test.jpg\""))
@@ -604,8 +604,8 @@ struct URLRoutingMultipartTests {
             let bodyString = String(data: body, encoding: .utf8) ?? ""
 
             // Should contain multipart boundaries
-            #expect(bodyString.contains("--Boundary-"), "Should contain boundary markers")
-            #expect(bodyString.hasSuffix("--\r\n"), "Should have closing boundary")
+            #expect(bodyString.contains("------=_Part_"), "Should contain boundary markers")
+            #expect(bodyString.hasSuffix("--"), "Should have closing boundary")
 
             // Should contain the field
             #expect(
@@ -812,8 +812,8 @@ struct URLRoutingMultipartTests {
             let boundary2 = String(contentType2.dropFirst("multipart/form-data; boundary=".count))
 
             #expect(boundary1 != boundary2)
-            #expect(boundary1.hasPrefix("Boundary-"))
-            #expect(boundary2.hasPrefix("Boundary-"))
+            #expect(boundary1.hasPrefix("----=_Part_"))
+            #expect(boundary2.hasPrefix("----=_Part_"))
         }
 
         @Test("Multipart.FileUpload handles maximum file size correctly")
@@ -914,14 +914,18 @@ struct URLRoutingMultipartTests {
             let contentType = fileUpload.contentType
             let boundary = String(contentType.dropFirst("multipart/form-data; boundary=".count))
 
-            // Boundary should only contain safe characters
-            let safeCharacterSet = CharacterSet(
-                charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
+            // Boundary should only contain RFC 2046 bcharsnospace characters
+            // RFC 2046 Section 5.1.1 defines bcharsnospace as:
+            // digits / alpha / "'" / "(" / ")" / "+" / "_" / "," / "-" / "." / "/" / ":" / "=" / "?"
+            let rfcSafeCharacterSet = CharacterSet(
+                charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'()+_,-./:=?"
             )
             let boundaryCharacterSet = CharacterSet(charactersIn: boundary)
 
-            #expect(safeCharacterSet.isSuperset(of: boundaryCharacterSet))
-            #expect(boundary.hasPrefix("Boundary-"))
+            #expect(rfcSafeCharacterSet.isSuperset(of: boundaryCharacterSet))
+            // RFC 2046 format: "----=_Part_{UUID}"
+            #expect(boundary.hasPrefix("----=_Part_"))
+            #expect(boundary.count <= 70)  // RFC 2046 maximum length
         }
     }
 

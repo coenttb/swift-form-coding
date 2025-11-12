@@ -40,9 +40,9 @@ let package = Package(
         .library(name: .multipartURLFormCodingURLRouting, targets: [.multipartURLFormCodingURLRouting])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-rfc-2045", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-2046", from: "0.1.0"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-7578", from: "0.2.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-2045.git", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-2046.git", from: "0.1.2"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-7578.git", from: "0.2.1"),
         .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.5.0"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.1.5"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.0")
