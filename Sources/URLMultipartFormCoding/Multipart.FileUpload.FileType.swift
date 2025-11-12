@@ -1,4 +1,5 @@
 import Foundation
+import RFC_2045
 
 // MARK: - Predefined File Types
 
@@ -13,9 +14,9 @@ extension Multipart.FileUpload.FileType {
     /// - Validation: UTF-8 text encoding check
     nonisolated(unsafe)
         public static let csv: Self = .init(
-            contentType: "text/csv",
+            contentType: RFC_2045.ContentType(type: "text", subtype: "csv"),
             fileExtension: "csv"
-        ) { data in
+        ) { (data: Foundation.Data) in
             guard let _ = String(data: data, encoding: .utf8) else {
                 throw Multipart.FileUpload.MultipartError.contentMismatch(
                     expected: "text/csv",
@@ -34,9 +35,9 @@ extension Multipart.FileUpload.FileType {
     /// - Validation: Checks for "%PDF" magic number at file start
     nonisolated(unsafe)
         public static let pdf: Self = .init(
-            contentType: "application/pdf",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "pdf"),
             fileExtension: "pdf"
-        ) { data in
+        ) { (data: Foundation.Data) in
             guard data.prefix(4).elementsEqual("%PDF".data(using: .utf8)!) else {
                 throw Multipart.FileUpload.MultipartError.contentMismatch(
                     expected: "application/pdf",
@@ -55,7 +56,7 @@ extension Multipart.FileUpload.FileType {
     /// - Note: Consider adding magic number validation for enhanced security
     nonisolated(unsafe)
         public static let excel: Self = .init(
-            contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
             fileExtension: "xlsx"
         )
 
@@ -68,7 +69,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `json`
     nonisolated(unsafe)
         public static let json: Self = .init(
-            contentType: "application/json",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "json"),
             fileExtension: "json"
         )
 
@@ -81,7 +82,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `txt`
     nonisolated(unsafe)
         public static let text: Self = .init(
-            contentType: "text/plain",
+            contentType: RFC_2045.ContentType.textPlain,
             fileExtension: "txt"
         )
 
@@ -128,7 +129,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `docx`
     nonisolated(unsafe)
         public static let docx: Self = .init(
-            contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "vnd.openxmlformats-officedocument.wordprocessingml.document"),
             fileExtension: "docx"
         )
 
@@ -140,7 +141,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `doc`
     nonisolated(unsafe)
         public static let doc: Self = .init(
-            contentType: "application/msword",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "msword"),
             fileExtension: "doc"
         )
 
@@ -154,7 +155,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `zip`
     nonisolated(unsafe)
         public static let zip: Self = .init(
-            contentType: "application/zip",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "zip"),
             fileExtension: "zip"
         )
 
@@ -168,7 +169,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `mp3`
     nonisolated(unsafe)
         public static let mp3: Self = .init(
-            contentType: "audio/mpeg",
+            contentType: RFC_2045.ContentType(type: "audio", subtype: "mpeg"),
             fileExtension: "mp3"
         )
 
@@ -180,7 +181,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `wav`
     nonisolated(unsafe)
         public static let wav: Self = .init(
-            contentType: "audio/wav",
+            contentType: RFC_2045.ContentType(type: "audio", subtype: "wav"),
             fileExtension: "wav"
         )
 
@@ -194,7 +195,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `mp4`
     nonisolated(unsafe)
         public static let mp4: Self = .init(
-            contentType: "video/mp4",
+            contentType: RFC_2045.ContentType(type: "video", subtype: "mp4"),
             fileExtension: "mp4"
         )
 
@@ -208,7 +209,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `sqlite`
     nonisolated(unsafe)
         public static let sqlite: Self = .init(
-            contentType: "application/x-sqlite3",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "x-sqlite3"),
             fileExtension: "sqlite"
         )
 
@@ -222,7 +223,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `swift`
     nonisolated(unsafe)
         public static let swift: Self = .init(
-            contentType: "text/x-swift",
+            contentType: RFC_2045.ContentType(type: "text", subtype: "x-swift"),
             fileExtension: "swift"
         )
 
@@ -234,7 +235,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `js`
     nonisolated(unsafe)
         public static let javascript: Self = .init(
-            contentType: "application/javascript",
+            contentType: RFC_2045.ContentType(type: "application", subtype: "javascript"),
             fileExtension: "js"
         )
 
@@ -248,7 +249,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `ttf`
     nonisolated(unsafe)
         public static let ttf: Self = .init(
-            contentType: "font/ttf",
+            contentType: RFC_2045.ContentType(type: "font", subtype: "ttf"),
             fileExtension: "ttf"
         )
 
@@ -260,7 +261,7 @@ extension Multipart.FileUpload.FileType {
     /// - File Extension: `svg`
     nonisolated(unsafe)
         public static let svg: Self = .init(
-            contentType: "image/svg+xml",
+            contentType: RFC_2045.ContentType(type: "image", subtype: "svg+xml"),
             fileExtension: "svg"
         )
 }

@@ -1,4 +1,5 @@
 import Foundation
+import RFC_2045
 
 /// A conversion that handles file uploads in multipart/form-data format.
 ///
@@ -138,7 +139,7 @@ extension Multipart {
         public func appendHeaders(to data: inout Foundation.Data) throws {
             let headers = """
                 Content-Disposition: form-data; name="\(fieldName)"; filename="\(filename)"
-                Content-Type: \(fileType.contentType)\r\n\r\n
+                Content-Type: \(fileType.contentType.headerValue)\r\n\r\n
                 """
 
             guard let headerData = headers.data(using: .utf8) else {
@@ -195,7 +196,7 @@ extension Multipart.FileUpload {
     ///
     /// ```swift
     /// let xmlType = FileType(
-    ///     contentType: "application/xml",
+    ///     contentType: RFC_2045.ContentType(type: "application", subtype: "xml"),
     ///     fileExtension: "xml"
     /// ) { data in
     ///     // Custom validation logic
@@ -208,11 +209,11 @@ extension Multipart.FileUpload {
     /// }
     /// ```
     public struct FileType {
-        /// The MIME content type for this file format.
-        let contentType: String
+        /// The RFC 2045 Content-Type for this file format.
+        public let contentType: RFC_2045.ContentType
 
         /// The file extension (without dot) for this file format.
-        let fileExtension: String
+        public let fileExtension: String
 
         /// Validation function that checks if data matches this file type.
         let validate: (Foundation.Data) throws -> Void
@@ -220,11 +221,11 @@ extension Multipart.FileUpload {
         /// Creates a new file type specification.
         ///
         /// - Parameters:
-        ///   - contentType: The MIME content type (e.g., "application/pdf")
+        ///   - contentType: The RFC 2045 Content-Type
         ///   - fileExtension: The file extension without dot (e.g., "pdf")
         ///   - validate: Optional validation function that throws on invalid data
         public init(
-            contentType: String,
+            contentType: RFC_2045.ContentType,
             fileExtension: String,
             validate: @escaping (Foundation.Data) throws -> Void = { _ in }
         ) {
@@ -265,11 +266,11 @@ extension Multipart.FileUpload.FileType {
     /// to ensure the file content matches the declared format, preventing
     /// security vulnerabilities from disguised malicious files.
     public struct ImageType {
-        /// The MIME content type for this image format.
-        let contentType: String
+        /// The RFC 2045 Content-Type for this image format.
+        public let contentType: RFC_2045.ContentType
 
         /// The file extension (without dot) for this image format.
-        let fileExtension: String
+        public let fileExtension: String
 
         /// Validation function that checks magic numbers for this image type.
         let validate: (Foundation.Data) throws -> Void
@@ -277,11 +278,11 @@ extension Multipart.FileUpload.FileType {
         /// Creates a new image type specification.
         ///
         /// - Parameters:
-        ///   - contentType: The MIME content type (e.g., "image/jpeg")
+        ///   - contentType: The RFC 2045 Content-Type
         ///   - fileExtension: The file extension without dot (e.g., "jpg")
         ///   - validate: Validation function that checks image magic numbers
         public init(
-            contentType: String,
+            contentType: RFC_2045.ContentType,
             fileExtension: String,
             validate: @escaping (Foundation.Data) throws -> Void = { _ in }
         ) {
