@@ -16,6 +16,9 @@ extension Target.Dependency {
     static var urlFormCodingURLRouting: Self { .target(name: .urlFormCodingURLRouting) }
     static var multipartURLFormCoding: Self { .target(name: .multipartURLFormCoding) }
     static var multipartURLFormCodingURLRouting: Self { .target(name: .multipartURLFormCodingURLRouting) }
+    static var rfc2045: Self { .product(name: "RFC 2045", package: "swift-rfc-2045") }
+    static var rfc2046: Self { .product(name: "RFC 2046", package: "swift-rfc-2046") }
+    static var rfc7578: Self { .product(name: "RFC 7578", package: "swift-rfc-7578") }
     static var pointfreeUrlFormCoding: Self { .product(name: "PointFreeURLFormCoding", package: "pointfree-url-form-coding") }
     static var dependencies: Self { .product(name: "Dependencies", package: "swift-dependencies") }
     static var dependenciesTestSupport: Self { .product(name: "DependenciesTestSupport", package: "swift-dependencies") }
@@ -25,10 +28,10 @@ extension Target.Dependency {
 let package = Package(
     name: "swift-url-form-coding",
     platforms: [
-        .iOS(.v13),
-        .macOS(.v10_15),
-        .tvOS(.v13),
-        .watchOS(.v6)
+        .macOS(.v14),
+        .iOS(.v17),
+        .tvOS(.v17),
+        .watchOS(.v10)
     ],
     products: [
         .library(name: .urlFormCoding, targets: [.urlFormCoding]),
@@ -37,7 +40,10 @@ let package = Package(
         .library(name: .multipartURLFormCodingURLRouting, targets: [.multipartURLFormCodingURLRouting])
     ],
     dependencies: [
-        .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.2.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-2045", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-2046", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-7578", from: "0.2.0"),
+        .package(url: "https://github.com/coenttb/pointfree-url-form-coding.git", from: "0.5.0"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.1.5"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.0")
     ],
@@ -83,6 +89,9 @@ let package = Package(
         .target(
             name: .multipartURLFormCoding,
             dependencies: [
+                .rfc2045,
+                .rfc2046,
+                .rfc7578,
                 .urlRouting,
                 .shared
             ]
