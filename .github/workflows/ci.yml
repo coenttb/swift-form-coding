@@ -36,8 +36,9 @@ jobs:
             ${{ runner.os }}-spm-
 
       # Note: swift test builds automatically, no separate build step needed
+      # FormCoding tests require URLRouting trait to access dependency modules
       - name: Test
-        run: swift test -c debug
+        run: swift test -c debug --traits URLRouting
 
       - name: Validate Package.swift
         run: swift package dump-package
@@ -62,8 +63,9 @@ jobs:
           restore-keys: ${{ runner.os }}-spm-
 
       # Note: swift test builds automatically in release mode
+      # FormCoding tests require URLRouting trait to access dependency modules
       - name: Test (release)
-        run: swift test -c release
+        run: swift test -c release --traits URLRouting
 
   # Compatibility check: Minimum supported Swift version (6.1)
   linux-compat:
@@ -81,5 +83,6 @@ jobs:
           restore-keys: ${{ runner.os }}-swift61-spm-
 
       # Note: swift test builds automatically
+      # FormCoding tests require URLRouting trait to access dependency modules
       - name: Test (Swift 6.1)
-        run: swift test -c release
+        run: swift test -c release --traits URLRouting
