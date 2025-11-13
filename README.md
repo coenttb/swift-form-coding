@@ -15,7 +15,7 @@ Add this package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/coenttb/swift-form-coding", from: "1.0.0")
+    .package(url: "https://github.com/coenttb/swift-form-coding", from: "0.1.0")
 ]
 ```
 
@@ -29,6 +29,14 @@ Then add the product to your target:
     ]
 )
 ```
+
+## Supported Platforms
+
+- macOS 14.0+
+- iOS 17.0+
+- tvOS 17.0+
+- watchOS 10.0+
+- Swift 6.1+
 
 ## Usage
 
