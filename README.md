@@ -1,5 +1,8 @@
 # swift-form-coding
 
+[![CI](https://github.com/coenttb/swift-form-coding/workflows/CI/badge.svg)](https://github.com/coenttb/swift-form-coding/actions/workflows/ci.yml)
+![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
+
 A convenience umbrella package that re-exports all form coding functionality for Swift.
 
 ## Overview
