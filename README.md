@@ -83,13 +83,32 @@ dependencies: [
 ]
 ```
 
+## URLRouting Integration
+
+Both underlying packages support optional URLRouting integration via Swift Package Manager traits:
+
+```swift
+// In your Package.swift
+dependencies: [
+    .package(
+        url: "https://github.com/coenttb/swift-form-coding",
+        from: "0.1.0",
+        traits: ["URLRouting"]  // Enable URLRouting trait
+    )
+]
+```
+
+When the `URLRouting` trait is enabled:
+- `Form.Conversion<T>` and `Multipart.Conversion<T>` conform to `URLRouting.Conversion`
+- URLRouting is re-exported for convenient access
+- Convenience methods like `.form(_:)` and `.multipart(_:)` are available
+
 ## Architecture
 
 This is a minimal umbrella package with no code of its own. It simply re-exports:
-- `URLFormCoding`
-- `URLFormCodingURLRouting`
-- `MultipartFormCoding`
-- `MultipartFormCodingURLRouting`
+- `URLFormCoding` - URL-encoded form data support
+- `MultipartFormCoding` - Multipart form data with file uploads
+- `URLRouting` - Conditionally exported when URLRouting trait is enabled
 
 The underlying packages are **completely independent** - they share no dependencies and can be used separately.
 
