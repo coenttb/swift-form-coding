@@ -13,18 +13,33 @@ let package = Package(
     products: [
         .library(name: "FormCoding", targets: ["FormCoding"])
     ],
+    traits: [
+        .trait(
+            name: "URLRouting",
+            description: "URLRouting integration for FormCoding"
+        )
+    ],
     dependencies: [
-        .package(path: "../swift-url-form-coding"),
-        .package(path: "../swift-multipart-form-coding")
+        .package(
+            url: "https://github.com/coenttb/swift-url-form-coding",
+            from: "0.1.0",
+            traits: [.trait(name: "URLRouting", condition: .when(traits: ["URLRouting"]))]
+        ),
+        .package(
+            url: "https://github.com/coenttb/swift-multipart-form-coding",
+            from: "0.1.0",
+            traits: [.trait(name: "URLRouting", condition: .when(traits: ["URLRouting"]))]
+        )
     ],
     targets: [
         .target(
             name: "FormCoding",
             dependencies: [
-                .product(name: "URLFormCoding", package: "swift-url-form-coding"),
-                .product(name: "URLFormCodingURLRouting", package: "swift-url-form-coding"),
+                .product(
+                    name: "URLFormCoding",
+                    package: "swift-url-form-coding"
+                ),
                 .product(name: "MultipartFormCoding", package: "swift-multipart-form-coding"),
-                .product(name: "MultipartFormCodingURLRouting", package: "swift-multipart-form-coding")
             ]
         )
     ]
