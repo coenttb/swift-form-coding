@@ -41,6 +41,10 @@ let package = Package(
                 ),
                 .product(name: "MultipartFormCoding", package: "swift-multipart-form-coding"),
             ]
+        ),
+        .testTarget(
+            name: "FormCoding Tests",
+            dependencies: ["FormCoding"]
         )
     ]
 )
