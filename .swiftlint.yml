@@ -1,61 +1,13 @@
 disabled_rules:
   - line_length
-  - identifier_name
-  - nesting  # Allow deeply nested enums for namespacing
-  - redundant_discardable_let  # Preserve 'let _ =' in result builder contexts (required for Swift 6.0+)
-  - opening_brace  # Handled by swift-format
-  - trailing_comma  # Handled by swift-format
-  - trailing_whitespace  # Preserve whitespace in snapshot tests
-  - orphaned_doc_comment  # Allow module-level documentation
-  - function_body_length  # Encoder/decoder functions can be complex
-  - cyclomatic_complexity  # Encoding/decoding logic can be complex
-  - file_length  # Complex encoding logic can require long files
-  - type_body_length  # Encoder/decoder types can be large
-  - non_optional_string_data_conversion  # UTF-8 encoding can fail, optional is correct
-  - large_tuple  # Test fixtures may use larger tuples for clarity
-  - unused_optional_binding  # let _ = pattern used for validation
-  - comment_spacing  # Intentional formatting in some cases
-  - type_name  # Lowercase enum names for namespacing (e.g., Field.form)
-
+  - function_body_length
+  - type_body_length
+  - file_length
 opt_in_rules:
-  - empty_count
   - explicit_init
-  - force_cast
-  - force_try
-  - closure_spacing
-  - operator_usage_whitespace
-  - private_outlet
-  - redundant_nil_coalescing
-  - literal_expression_end_indentation
-  - single_test_class
-  - sorted_first_last
-  - vertical_whitespace
-  - legacy_random
-  - no_extension_access_modifier
-  - colon
-
+  - explicit_type_interface
 included:
-  - Package.swift
   - Sources
   - Tests
-
 excluded:
-  - Carthage
-  - Pods
-  - fastlane
-  - build
   - .build
-
-analyzer_rules:
-  - unused_import
-
-colon:
-  apply_to_dictionaries: true
-
-vertical_whitespace:
-  max_empty_lines: 1
-
-# Allow more function parameters for encoding/decoding functions
-function_parameter_count:
-  warning: 8
-  error: 10
